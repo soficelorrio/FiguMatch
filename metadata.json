@@ -1,0 +1,6 @@
+{
+  "name": "FiguMatch",
+  "description": "Aplicación mobile-first para conectar coleccionistas cercanos para intercambiar figuritas de manera simple, rápida y segura.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
