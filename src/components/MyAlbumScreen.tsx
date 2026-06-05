@@ -241,7 +241,7 @@ export default function MyAlbumScreen({
           </div>
 
           {/* Sticker Grid container with small screen optimization */}
-          <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 max-h-[46vh] overflow-y-auto pr-1">
+          <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 max-h-[48vh] overflow-y-auto pr-1">
             {filteredStickers.map((sticker) => {
               const cfg = STATUS_CONFIG[sticker.status];
               return (
@@ -249,18 +249,16 @@ export default function MyAlbumScreen({
                   key={sticker.number}
                   id={`sticker-cell-${sticker.number}`}
                   onClick={() => setActiveNumber(sticker.number)}
-                  className={`aspect-square flex flex-col items-center justify-between p-1 rounded-xl border transition cursor-pointer relative overflow-hidden ${cfg.bgClass} ${cfg.borderClass} hover:scale-105 active:scale-95 duration-150 shadow-2xs`}
+                  className={`aspect-square flex flex-col items-center justify-center p-3 rounded-2xl border transition-all duration-150 cursor-pointer relative ${cfg.bgClass} ${cfg.borderClass} hover:scale-105 active:scale-95 shadow-xs`}
                 >
-                  {/* Visual mini status dot */}
-                  <div className="w-full flex justify-end">
-                    <span className={`w-2 h-2 rounded-full ${cfg.dotClass}`}></span>
-                  </div>
+                  {/* Visual mini status dot inside square */}
+                  <span className={`absolute top-2 right-2 w-2 h-2 rounded-full ${cfg.dotClass}`}></span>
                   
-                  <span className="text-sm font-black text-gray-900 leading-none">
+                  <span className="text-base font-black text-slate-800 leading-none">
                     #{sticker.number}
                   </span>
                   
-                  <span className="text-[8px] font-bold text-gray-400 leading-none truncate w-full text-center">
+                  <span className="text-[9px] font-black tracking-tight text-slate-600/90 mt-1 leading-none uppercase">
                     {cfg.label}
                   </span>
                 </button>
