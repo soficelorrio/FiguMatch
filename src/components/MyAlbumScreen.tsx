@@ -8,7 +8,192 @@ import {
   getAllMainAlbumCodes, 
   getAllStickerCodes 
 } from '../data';
-import { Search, Plus, Sparkles, Filter, CheckCircle2, ChevronRight, X, Heart, Award, ArrowRight } from 'lucide-react';
+import { Search, Plus, Sparkles, Filter, CheckCircle2, ChevronRight, ChevronDown, ChevronUp, X, Heart, Award, ArrowRight } from 'lucide-react';
+
+interface WorldCupGroup {
+  id: string;
+  name: string;
+  teams: string[];
+}
+
+const worldCupGroups: WorldCupGroup[] = [
+  {
+    id: "all",
+    name: "Todas",
+    teams: [
+      "MEX", "RSA", "KOR", "CZE", "CAN", "BIH", "QAT", "SUI", "BRA", "MAR", "HAI", "SCO",
+      "USA", "PAR", "AUS", "TUR", "GER", "CUW", "CIV", "ECU", "NED", "JPN", "SWE", "TUN",
+      "BEL", "EGY", "IRN", "NZL", "ESP", "CPV", "KSA", "URU", "FRA", "SEN", "IRQ", "NOR",
+      "ARG", "ALG", "AUT", "JOR", "POR", "COD", "UZB", "COL", "ENG", "CRO", "GHA", "PAN"
+    ]
+  },
+  {
+    id: "group-a",
+    name: "Grupo A",
+    teams: ["MEX", "RSA", "KOR", "CZE"]
+  },
+  {
+    id: "group-b",
+    name: "Grupo B",
+    teams: ["CAN", "BIH", "QAT", "SUI"]
+  },
+  {
+    id: "group-c",
+    name: "Grupo C",
+    teams: ["BRA", "MAR", "HAI", "SCO"]
+  },
+  {
+    id: "group-d",
+    name: "Grupo D",
+    teams: ["USA", "PAR", "AUS", "TUR"]
+  },
+  {
+    id: "group-e",
+    name: "Grupo E",
+    teams: ["GER", "CUW", "CIV", "ECU"]
+  },
+  {
+    id: "group-f",
+    name: "Grupo F",
+    teams: ["NED", "JPN", "SWE", "TUN"]
+  },
+  {
+    id: "group-g",
+    name: "Grupo G",
+    teams: ["BEL", "EGY", "IRN", "NZL"]
+  },
+  {
+    id: "group-h",
+    name: "Grupo H",
+    teams: ["ESP", "CPV", "KSA", "URU"]
+  },
+  {
+    id: "group-i",
+    name: "Grupo I",
+    teams: ["FRA", "SEN", "IRQ", "NOR"]
+  },
+  {
+    id: "group-j",
+    name: "Grupo J",
+    teams: ["ARG", "ALG", "AUT", "JOR"]
+  },
+  {
+    id: "group-k",
+    name: "Grupo K",
+    teams: ["POR", "COD", "UZB", "COL"]
+  },
+  {
+    id: "group-l",
+    name: "Grupo L",
+    teams: ["ENG", "CRO", "GHA", "PAN"]
+  }
+];
+
+const teamsData: Record<string, { name: string; code: string }> = {
+  MEX: { name: "México", code: "MEX" },
+  RSA: { name: "Sudáfrica", code: "RSA" },
+  KOR: { name: "Corea del Sur", code: "KOR" },
+  CZE: { name: "República Checa", code: "CZE" },
+  CAN: { name: "Canadá", code: "CAN" },
+  BIH: { name: "Bosnia y Herzegovina", code: "BIH" },
+  QAT: { name: "Qatar", code: "QAT" },
+  SUI: { name: "Suiza", code: "SUI" },
+  BRA: { name: "Brasil", code: "BRA" },
+  MAR: { name: "Marruecos", code: "MAR" },
+  HAI: { name: "Haití", code: "HAI" },
+  SCO: { name: "Escocia", code: "SCO" },
+  USA: { name: "Estados Unidos", code: "USA" },
+  PAR: { name: "Paraguay", code: "PAR" },
+  AUS: { name: "Australia", code: "AUS" },
+  TUR: { name: "Turquía", code: "TUR" },
+  GER: { name: "Alemania", code: "GER" },
+  CUW: { name: "Curazao", code: "CUW" },
+  CIV: { name: "Costa de Marfil", code: "CIV" },
+  ECU: { name: "Ecuador", code: "ECU" },
+  NED: { name: "Países Bajos", code: "NED" },
+  JPN: { name: "Japón", code: "JPN" },
+  SWE: { name: "Suecia", code: "SWE" },
+  TUN: { name: "Túnez", code: "TUN" },
+  BEL: { name: "Bélgica", code: "BEL" },
+  EGY: { name: "Egipto", code: "EGY" },
+  IRN: { name: "Irán", code: "IRN" },
+  NZL: { name: "Nueva Zelanda", code: "NZL" },
+  ESP: { name: "España", code: "ESP" },
+  CPV: { name: "Cabo Verde", code: "CPV" },
+  KSA: { name: "Arabia Saudita", code: "KSA" },
+  URU: { name: "Uruguay", code: "URU" },
+  FRA: { name: "Francia", code: "FRA" },
+  SEN: { name: "Senegal", code: "SEN" },
+  IRQ: { name: "Irak", code: "IRQ" },
+  NOR: { name: "Noruega", code: "NOR" },
+  ARG: { name: "Argentina", code: "ARG" },
+  ALG: { name: "Argelia", code: "ALG" },
+  AUT: { name: "Austria", code: "AUT" },
+  JOR: { name: "Jordania", code: "JOR" },
+  POR: { name: "Portugal", code: "POR" },
+  COD: { name: "República Democrática del Congo", code: "COD" },
+  UZB: { name: "Uzbekistán", code: "UZB" },
+  COL: { name: "Colombia", code: "COL" },
+  ENG: { name: "Inglaterra", code: "ENG" },
+  CRO: { name: "Croacia", code: "CRO" },
+  GHA: { name: "Ghana", code: "GHA" },
+  PAN: { name: "Panamá", code: "PAN" }
+};
+
+function generateTeamStickers(teamCode: string) {
+  return Array.from({ length: 20 }, (_, index) => {
+    const number = index + 1;
+    return {
+      id: `${teamCode}${number}`,
+      code: `${teamCode}${number}`,
+      teamCode: teamCode,
+      number: number,
+      type:
+        number === 1
+          ? "Escudo / Emblema"
+          : number === 13
+          ? "Foto grupal"
+          : "Jugador",
+      status: "Me falta"
+    };
+  });
+}
+
+interface AlbumSection {
+  id: "all" | "fwc-inicial" | "selecciones" | "fwc-history" | "coca-cola";
+  name: string;
+  order: number;
+}
+
+const albumSections: AlbumSection[] = [
+  {
+    id: "all",
+    name: "Todas",
+    order: 1
+  },
+  {
+    id: "fwc-inicial",
+    name: "FWC Inicial",
+    order: 2
+  },
+  {
+    id: "selecciones",
+    name: "Selecciones",
+    order: 3
+  },
+  {
+    id: "fwc-history",
+    name: "FWC History",
+    order: 4
+  },
+  {
+    id: "coca-cola",
+    name: "Coca-Cola Promo Stickers",
+    order: 5
+  }
+];
+
+const defaultActiveSection = "all";
 
 interface MyAlbumScreenProps {
   stickers: StickerState[];
@@ -78,9 +263,13 @@ export default function MyAlbumScreen({
   const [searchQuery, setSearchQuery] = useState('');
   
   // Section layout selector
-  // Sections: 'inicio' (FWC 00 to 8), 'selecciones', 'history' (FWC 9 to 19), 'cocacola'
-  const [activeSection, setActiveSection] = useState<'todos' | 'inicio' | 'selecciones' | 'history' | 'cocacola'>('inicio');
+  const [activeSection, setActiveSection] = useState<"all" | "fwc-inicial" | "selecciones" | "fwc-history" | "coca-cola">(defaultActiveSection);
   const [selectedSelection, setSelectedSelection] = useState<string>('ARG'); // default to Argentina
+
+  // Selecciones-specific dynamic state
+  const [activeGroupTab, setActiveGroupTab] = useState<string>('all');
+  const [selectionsFilter, setSelectionsFilter] = useState<'todos' | StickerStatus>('todos');
+  const [expandedTeams, setExpandedTeams] = useState<Record<string, boolean>>({ ARG: true });
 
   const [activeCode, setActiveCode] = useState<string | null>(null);
 
@@ -103,16 +292,16 @@ export default function MyAlbumScreen({
   const visibleStickers = useMemo(() => {
     let baseCodes: string[] = [];
 
-    if (activeSection === 'todos') {
+    if (activeSection === 'all') {
       baseCodes = getAllStickerCodes();
-    } else if (activeSection === 'inicio') {
+    } else if (activeSection === 'fwc-inicial') {
       baseCodes = FWC_INITIAL_CODES;
     } else if (activeSection === 'selecciones') {
       // Pick stickers of currently selected selection
       baseCodes = Array.from({ length: 20 }, (_, i) => `${selectedSelection}${i + 1}`);
-    } else if (activeSection === 'history') {
+    } else if (activeSection === 'fwc-history') {
       baseCodes = FWC_FINAL_CODES;
-    } else if (activeSection === 'cocacola') {
+    } else if (activeSection === 'coca-cola') {
       baseCodes = CC_PROMO_CODES;
     }
 
@@ -362,155 +551,373 @@ export default function MyAlbumScreen({
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Navegación del Álbum</p>
               
               <div className="flex gap-1 overflow-x-auto pb-1 mt-1.5 scrollbar-none">
-                {[
-                  { id: 'inicio', label: '1. FWC Inicial', badge: '00-FWC8' },
-                  { id: 'selecciones', label: '2. Selecciones', badge: '48 Equipos' },
-                  { id: 'history', label: '3. FWC History', badge: 'FWC9-FWC19' },
-                  { id: 'cocacola', label: '4. Coca-Cola Promo', badge: 'CC1-CC14 (Opcional)' },
-                  { id: 'todos', label: '🔍 Ver Todo', badge: '994 códigos' }
-                ].map((sec) => (
-                  <button
-                    key={sec.id}
-                    onClick={() => {
-                      setActiveSection(sec.id as any);
-                    }}
-                    className={`py-2 px-3 rounded-xl text-xs font-black whitespace-nowrap flex flex-col items-start transition-all ${
-                      activeSection === sec.id
-                        ? 'bg-slate-950 text-white shadow-xs'
-                        : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
-                    }`}
-                  >
-                    <span>{sec.label}</span>
-                    <span className="text-[8px] font-bold opacity-60 mt-0.5">{sec.badge}</span>
-                  </button>
-                ))}
+                {[...albumSections]
+                  .sort((a, b) => a.order - b.order)
+                  .map((sec) => {
+                    const badge = 
+                      sec.id === 'all' ? '994 códigos' :
+                      sec.id === 'fwc-inicial' ? '00-FWC8' :
+                      sec.id === 'selecciones' ? '48 Seleciones' :
+                      sec.id === 'fwc-history' ? 'FWC9-FWC19' :
+                      'CC1-CC14';
+                    return (
+                      <button
+                        key={sec.id}
+                        onClick={() => {
+                          setActiveSection(sec.id);
+                        }}
+                        className={`py-2 px-3.5 rounded-xl text-xs font-black whitespace-nowrap flex flex-col items-start transition-all cursor-pointer ${
+                          activeSection === sec.id
+                            ? 'bg-slate-950 text-white shadow-xs'
+                            : 'bg-slate-50 text-slate-550 hover:bg-slate-100'
+                        }`}
+                      >
+                        <span>{sec.name}</span>
+                        <span className="text-[8px] font-bold opacity-60 mt-0.5">{badge}</span>
+                      </button>
+                    );
+                  })
+                }
               </div>
             </div>
 
-            {/* Selection Custom Dropdown filter */}
-            {activeSection === 'selecciones' && (
-              <div className="pt-1 border-t border-slate-50 flex flex-col sm:flex-row sm:items-center gap-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap leading-none">
-                  Filtro por Selección:
-                </label>
-                <div className="flex-1 flex gap-2">
-                  <select
-                    value={selectedSelection}
-                    onChange={(e) => setSelectedSelection(e.target.value)}
-                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 text-xs font-black text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white"
-                  >
-                    {SELECTIONS.map((team) => {
-                      const cStats = getCountryStats(team.code);
-                      return (
-                        <option key={team.code} value={team.code}>
-                          {team.code} - {team.name} ({cStats.owned}/20)
-                        </option>
-                      );
-                    })}
-                  </select>
-
-                  {/* Visual fast rating indicator for selected country */}
-                  <div className="bg-amber-50 border border-amber-100 rounded-xl px-3 flex items-center justify-center text-xs font-bold text-amber-800 whitespace-nowrap">
-                    ⭐ {getCountryStats(selectedSelection).owned}/20
+            {activeSection !== 'selecciones' ? (
+              <>
+                {/* Quick status button toggles & query */}
+                <div className="pt-2 border-t border-slate-55 flex flex-col gap-2">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Buscar código de figurita (ej: FWC3)..."
+                      className="w-full bg-slate-50 border border-slate-150 rounded-xl py-2 pl-9 pr-4 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-600 text-slate-700"
+                    />
+                    <Search className="absolute left-3 top-2.5 text-slate-400" size={14} />
                   </div>
-                </div>
-              </div>
-            )}
 
-            {/* Quick status button toggles & query */}
-            <div className="pt-2 border-t border-slate-55 flex flex-col gap-2">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Buscar código de figurita (ej: ARG17)..."
-                  className="w-full bg-slate-50 border border-slate-150 rounded-xl py-2 pl-9 pr-4 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-600 text-slate-700"
-                />
-                <Search className="absolute left-3 top-2.5 text-slate-400" size={14} />
-              </div>
-
-              {/* Status scroll menu */}
-              <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
-                <button
-                  onClick={() => setStatusFilter('todos')}
-                  className={`py-1.5 px-3 rounded-lg text-[10px] uppercase font-black tracking-wider whitespace-nowrap transition-all ${
-                    statusFilter === 'todos' ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
-                  }`}
-                >
-                  Todas ({visibleStickers.length})
-                </button>
-                {(Object.keys(STATUS_CONFIG) as StickerStatus[]).map((st) => {
-                  const filteredCount = visibleStickers.filter(item => item.status === st).length;
-                  return (
+                  {/* Status scroll menu */}
+                  <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
                     <button
-                      key={st}
-                      onClick={() => setStatusFilter(st)}
-                      className={`py-1.5 px-3 rounded-lg text-[10px] uppercase font-black tracking-wider whitespace-nowrap flex items-center gap-1 transition-all ${
-                        statusFilter === st
-                          ? `${STATUS_CONFIG[st].bgClass} ${STATUS_CONFIG[st].textClass} border border-indigo-200`
-                          : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
+                      onClick={() => setStatusFilter('todos')}
+                      className={`py-1.5 px-3 rounded-lg text-[10px] uppercase font-black tracking-wider whitespace-nowrap transition-all ${
+                        statusFilter === 'todos' ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
                       }`}
                     >
-                      <span className={`w-1.5 h-1.5 rounded-full ${STATUS_CONFIG[st].dotClass}`}></span>
-                      {STATUS_CONFIG[st].label}
+                      Todas ({visibleStickers.length})
+                    </button>
+                    {(Object.keys(STATUS_CONFIG) as StickerStatus[]).map((st) => {
+                      return (
+                        <button
+                          key={st}
+                          onClick={() => setStatusFilter(st)}
+                          className={`py-1.5 px-3 rounded-lg text-[10px] uppercase font-black tracking-wider whitespace-nowrap flex items-center gap-1 transition-all ${
+                            statusFilter === st
+                              ? `${STATUS_CONFIG[st].bgClass} ${STATUS_CONFIG[st].textClass} border border-indigo-200`
+                              : 'bg-slate-50 text-slate-550 hover:bg-slate-100'
+                          }`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full ${STATUS_CONFIG[st].dotClass}`}></span>
+                          {STATUS_CONFIG[st].label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            ) : null}
+          </div>
+
+          {activeSection !== 'selecciones' ? (
+            <>
+              {activeSection === 'coca-cola' && (
+                <div className="bg-rose-50/50 border border-rose-100 pl-3.5 pr-2.5 py-2.5 rounded-2xl flex justify-between items-center text-[11px] font-bold text-rose-900 leading-tight">
+                  <span>Promo Coca-Cola: <strong>Tenés {stats.ccOwned} de 14 stickers.</strong></span>
+                  <span className="text-[10px] bg-rose-100/70 text-rose-800 px-2.5 py-0.5 rounded-md font-black">
+                    {stats.ccPercent}%
+                  </span>
+                </div>
+              )}
+
+              {/* Dynamic Sticker Grid container with small screen optimization */}
+              <div className="grid grid-cols-4 gap-2.5 max-h-[44vh] overflow-y-auto pr-1">
+                {visibleStickers.map((sticker) => {
+                  const cfg = STATUS_CONFIG[sticker.status];
+                  return (
+                    <button
+                      key={sticker.code}
+                      id={`sticker-cell-${sticker.code}`}
+                      onClick={() => setActiveCode(sticker.code)}
+                      className={`aspect-square flex flex-col items-center justify-center p-2 rounded-2xl border transition-all duration-150 cursor-pointer relative ${cfg.bgClass} ${cfg.borderClass} hover:scale-105 active:scale-95 shadow-2xs`}
+                    >
+                      {/* Status Indicator circle */}
+                      <span className={`absolute top-2 right-2 w-2 h-2 rounded-full ${cfg.dotClass}`}></span>
+                      
+                      <span className="text-xs font-black text-slate-850 leading-none">
+                        {sticker.code}
+                      </span>
+                      
+                      {/* Minified descriptor */}
+                      <span className="text-[7.5px] font-black tracking-tight text-slate-500/80 mt-1.5 leading-none uppercase truncate max-w-full">
+                        {cfg.label}
+                      </span>
                     </button>
                   );
                 })}
               </div>
-            </div>
-          </div>
 
-          {/* Current Selection Progress details */}
-          {activeSection === 'selecciones' && (
-            <div className="bg-indigo-50/50 border border-indigo-100 pl-3.5 pr-2.5 py-2.5 rounded-2xl flex justify-between items-center text-[11px] font-bold text-indigo-900 leading-tight">
-              <span>{SELECTIONS.find(s=>s.code === selectedSelection)?.name}: <strong>Tenés {getCountryStats(selectedSelection).owned} de 20 figuritas.</strong></span>
-              <span className="text-[10px] bg-indigo-100/70 text-indigo-800 px-2.5 py-0.5 rounded-md font-black">
-                {getCountryStats(selectedSelection).percent}%
-              </span>
-            </div>
-          )}
+              {visibleStickers.length === 0 && (
+                <div className="text-center py-10 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+                  <p className="text-xs text-slate-400 font-bold">No se encontraron figuritas con estas características.</p>
+                  <p className="text-[10px] text-slate-400 mt-1">Intentá cambiar los filtros o el buscador de códigos.</p>
+                </div>
+              )}
+            </>
+          ) : (
+            /* Sub-tab y sistema de carrusel interactivo para SELECCIONES */
+            <div className="space-y-4">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Selecciones por Grupos</p>
+                <div className="flex gap-1 overflow-x-auto pb-1 mt-1.5 scrollbar-none">
+                  {worldCupGroups.map((group) => (
+                    <button
+                      key={group.id}
+                      onClick={() => {
+                        setActiveGroupTab(group.id);
+                      }}
+                      className={`py-1.5 px-3.5 rounded-xl text-xs font-black whitespace-nowrap transition-all cursor-pointer ${
+                        activeGroupTab === group.id
+                          ? 'bg-indigo-600 text-white shadow-xs'
+                          : 'bg-slate-50 text-slate-500 hover:bg-slate-105'
+                      }`}
+                    >
+                      {group.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-          {activeSection === 'cocacola' && (
-            <div className="bg-rose-50/50 border border-rose-100 pl-3.5 pr-2.5 py-2.5 rounded-2xl flex justify-between items-center text-[11px] font-bold text-rose-900 leading-tight">
-              <span>Promo Coca-Cola: <strong>Tenés {stats.ccOwned} de 14 stickers.</strong></span>
-              <span className="text-[10px] bg-rose-100/70 text-rose-800 px-2.5 py-0.5 rounded-md font-black">
-                {stats.ccPercent}%
-              </span>
-            </div>
-          )}
+              {/* Dynamic computed Progress Banner for group */}
+              {(() => {
+                if (activeGroupTab === 'all') {
+                  const totalSel = 48 * 20; // 960
+                  let ownedSel = 0;
+                  Object.keys(teamsData).forEach(teamCode => {
+                    for (let i = 1; i <= 20; i++) {
+                      const status = stickerStateDict[`${teamCode}${i}`] || 'faltante';
+                      if (status !== 'faltante') ownedSel++;
+                    }
+                  });
+                  const percent = Math.round((ownedSel / totalSel) * 100);
+                  return (
+                    <div className="bg-indigo-50/50 border border-indigo-100 p-4 rounded-3xl space-y-2">
+                      <div className="flex justify-between items-center text-xs font-bold text-indigo-900 leading-none">
+                        <span>Todas las selecciones</span>
+                        <span className="text-[11px] font-black font-mono bg-indigo-100 text-indigo-850 px-2 py-0.5 rounded-md">
+                          {ownedSel} / {totalSel} ({percent}%)
+                        </span>
+                      </div>
+                      <p className="text-xs text-indigo-800 font-bold leading-none">
+                        Tenés {ownedSel} de {totalSel} figuritas de selecciones.
+                      </p>
+                      <div className="w-full h-1.5 bg-indigo-100 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-indigo-600 transition-all duration-300"
+                          style={{ width: `${percent}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  );
+                } else {
+                  const groupObj = worldCupGroups.find(g => g.id === activeGroupTab);
+                  if (!groupObj) return null;
+                  let ownedGroup = 0;
+                  const totalGroup = groupObj.teams.length * 20; // 80
+                  groupObj.teams.forEach(teamCode => {
+                    for (let i = 1; i <= 20; i++) {
+                      const status = stickerStateDict[`${teamCode}${i}`] || 'faltante';
+                      if (status !== 'faltante') ownedGroup++;
+                    }
+                  });
+                  const percent = Math.round((ownedGroup / totalGroup) * 100);
+                  return (
+                    <div className="bg-indigo-50/50 border border-indigo-100 p-4 rounded-3xl space-y-2">
+                      <div className="flex justify-between items-center text-xs font-bold text-indigo-900 leading-none">
+                        <span>{groupObj.name}</span>
+                        <span className="text-[11px] font-black font-mono bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-md">
+                          {ownedGroup} / {totalGroup} ({percent}%)
+                        </span>
+                      </div>
+                      <p className="text-xs text-indigo-850 font-bold leading-none">
+                        Tenés {ownedGroup} de {totalGroup} figuritas del {groupObj.name}.
+                      </p>
+                      <div className="w-full h-1.5 bg-indigo-100/70 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-indigo-600 transition-all duration-300"
+                          style={{ width: `${percent}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  );
+                }
+              })()}
 
-          {/* Dynamic Sticker Grid container with small screen optimization */}
-          <div className="grid grid-cols-4 gap-2.5 max-h-[44vh] overflow-y-auto pr-1">
-            {visibleStickers.map((sticker) => {
-              const cfg = STATUS_CONFIG[sticker.status];
-              return (
-                <button
-                  key={sticker.code}
-                  id={`sticker-cell-${sticker.code}`}
-                  onClick={() => setActiveCode(sticker.code)}
-                  className={`aspect-square flex flex-col items-center justify-center p-2 rounded-2xl border transition-all duration-150 cursor-pointer relative ${cfg.bgClass} ${cfg.borderClass} hover:scale-105 active:scale-95 shadow-2xs`}
-                >
-                  {/* Status Indicator circle */}
-                  <span className={`absolute top-2 right-2 w-2 h-2 rounded-full ${cfg.dotClass}`}></span>
-                  
-                  <span className="text-xs font-black text-slate-850 leading-none">
-                    {sticker.code}
-                  </span>
-                  
-                  {/* Minified descriptor */}
-                  <span className="text-[7.5px] font-black tracking-tight text-slate-500/80 mt-1.5 leading-none uppercase truncate max-w-full">
-                    {cfg.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+              {/* Selections Specific Status Filters Pills Menu */}
+              <div className="space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Filtrar figuritas</p>
+                <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
+                  {[
+                    { id: 'todos', label: 'Todas las figuritas' },
+                    { id: 'faltante', label: 'Me faltan' },
+                    { id: 'tengo', label: 'Las tengo' },
+                    { id: 'repetida', label: 'Repetidas' },
+                    { id: 'reservada', label: 'Reservadas' },
+                    { id: 'intercambiada', label: 'Intercambiadas' }
+                  ].map((opt) => {
+                    const isCurrent = selectionsFilter === opt.id;
+                    const colorClass = opt.id === 'todos' 
+                      ? 'bg-indigo-500' 
+                      : STATUS_CONFIG[opt.id as StickerStatus]?.dotClass || 'bg-slate-400';
+                    return (
+                      <button
+                        key={opt.id}
+                        onClick={() => setSelectionsFilter(opt.id as any)}
+                        className={`py-1.5 px-3 rounded-xl text-[10px] uppercase font-black tracking-wider whitespace-nowrap flex items-center gap-1 transition-all cursor-pointer ${
+                          isCurrent
+                            ? 'bg-indigo-650 bg-indigo-600 text-white shadow-xs'
+                            : 'bg-slate-50 text-slate-550 hover:bg-slate-100'
+                        }`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${colorClass}`}></span>
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
-          {visibleStickers.length === 0 && (
-            <div className="text-center py-10 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
-              <p className="text-xs text-slate-400 font-bold">No se encontraron figuritas con estas características.</p>
-              <p className="text-[10px] text-slate-400 mt-1">Intentá cambiar los filtros o el buscador de códigos.</p>
+              {/* Dynamic Accordions list of Selections */}
+              <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-1">
+                {(() => {
+                  const activeGroupObj = worldCupGroups.find(g => g.id === activeGroupTab);
+                  const activeTeamsList = activeGroupObj ? activeGroupObj.teams : [];
+
+                  return activeTeamsList.map((teamCode) => {
+                    const teamObj = teamsData[teamCode];
+                    if (!teamObj) return null;
+
+                    // Compute dynamic selection stats
+                    let owned = 0;
+                    for (let i = 1; i <= 20; i++) {
+                      const status = stickerStateDict[`${teamCode}${i}`] || 'faltante';
+                      if (status !== 'faltante') owned++;
+                    }
+
+                    const isExpanded = !!expandedTeams[teamCode];
+                    const parentGroup = worldCupGroups.find(g => g.id !== 'all' && g.teams.includes(teamCode))?.name || 'Mundial';
+
+                    // Generate local stickers
+                    const stickerList = generateTeamStickers(teamCode).map(s => ({
+                      ...s,
+                      status: stickerStateDict[s.code] || 'faltante'
+                    }));
+
+                    // Apply active status filters
+                    const displayedStickers = stickerList.filter(s => {
+                      if (selectionsFilter === 'todos') return true;
+                      return s.status === selectionsFilter;
+                    });
+
+                    return (
+                      <div key={teamCode} className="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-2xs">
+                        {/* Header accordion bar */}
+                        <div 
+                          onClick={() => {
+                            setExpandedTeams(prev => ({
+                              ...prev,
+                              [teamCode]: !prev[teamCode]
+                            }));
+                          }}
+                          className="p-4 flex justify-between items-center hover:bg-slate-50/50 transition cursor-pointer select-none"
+                        >
+                          <div className="min-w-0 pr-3">
+                            <p className="text-sm font-extrabold text-slate-900 leading-tight flex items-center gap-1.5">
+                              <span>{teamObj.name}</span>
+                              <span className="font-mono text-[9px] font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">
+                                {teamCode}
+                              </span>
+                            </p>
+                            <p className="text-[10px] text-slate-400 mt-1 font-bold">
+                              {parentGroup} — {owned} de 20 un. ({Math.round(owned / 20 * 100)}%)
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <div className="text-right">
+                              <span className="text-[10px] font-extrabold text-indigo-600 font-mono bg-indigo-50 px-2 py-0.5 rounded-full">
+                                {owned}/20
+                              </span>
+                            </div>
+                            {isExpanded ? (
+                              <ChevronUp className="text-slate-400 h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="text-slate-400 h-4 w-4" />
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Collateral expanded body */}
+                        {isExpanded && (
+                          <div className="p-4 bg-slate-50/30 border-t border-slate-50 space-y-3">
+                            {displayedStickers.length > 0 ? (
+                              <div className="grid grid-cols-2 gap-2">
+                                {displayedStickers.map((sticker) => {
+                                  const cfg = STATUS_CONFIG[sticker.status];
+                                  return (
+                                    <div 
+                                      key={sticker.code}
+                                      className={`p-3 rounded-2xl border flex flex-col justify-between ${cfg.bgClass} ${cfg.borderClass} shadow-2xs`}
+                                    >
+                                      <div className="space-y-1 min-w-0">
+                                        <div className="flex justify-between items-center">
+                                          <span className="text-xs font-black text-slate-800 font-mono">
+                                            {sticker.code}
+                                          </span>
+                                          <span className={`w-2 h-2 rounded-full ${cfg.dotClass}`}></span>
+                                        </div>
+                                        <p className="text-[9px] text-slate-400 font-black uppercase tracking-tight truncate leading-none">
+                                          {sticker.type}
+                                        </p>
+                                        <p className={`text-[10.5px] font-black leading-tight ${cfg.textClass}`}>
+                                          {cfg.label}
+                                        </p>
+                                      </div>
+
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setActiveCode(sticker.code);
+                                        }}
+                                        className="w-full mt-2 py-1 px-2 bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 rounded-xl text-[10px] text-slate-700 font-bold transition flex items-center justify-center gap-1 cursor-pointer"
+                                      >
+                                        📌 Editar
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <p className="text-[10px] text-slate-400 font-bold text-center py-4">
+                                No hay figuritas en estado "{selectionsFilter === 'todos' ? 'Todas' : STATUS_CONFIG[selectionsFilter as StickerStatus]?.label}" para esta selección.
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
             </div>
           )}
         </>
