@@ -7,8 +7,142 @@ export const INITIAL_ALBUMS: Album[] = [
     totalStickers: 980,
     category: 'Futbol',
     imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=200'
+  },
+  {
+    id: 'copa_america_2024',
+    name: 'Panini Copa América USA 2024',
+    totalStickers: 430,
+    category: 'Futbol',
+    imageUrl: 'https://images.unsplash.com/photo-1489945052260-4f21d5226e49?auto=format&fit=crop&q=80&w=200'
   }
 ];
+
+export const COPA_AMERICA_GROUPS = [
+  {
+    id: "all",
+    name: "Todas",
+    teams: ["ARG", "PER", "CHI", "CAN", "MEX", "ECU", "VEN", "JAM", "USA", "URU", "PAN", "BOL", "BRA", "COL", "PAR", "CRC", "HON", "TRI"]
+  },
+  {
+    id: "group-a",
+    name: "Grupo A",
+    teams: ["ARG", "PER", "CHI", "CAN"]
+  },
+  {
+    id: "group-b",
+    name: "Grupo B",
+    teams: ["MEX", "ECU", "VEN", "JAM"]
+  },
+  {
+    id: "group-c",
+    name: "Grupo C",
+    teams: ["USA", "URU", "PAN", "BOL"]
+  },
+  {
+    id: "group-d",
+    name: "Grupo D",
+    teams: ["BRA", "COL", "PAR", "CRC"]
+  },
+  {
+    id: "play-in",
+    name: "Play-in / Extras",
+    teams: ["HON", "TRI"]
+  }
+];
+
+export const COPA_AMERICA_TEAMS: Record<string, { name: string; code: string; group: string }> = {
+  ARG: { name: "Argentina", code: "ARG", group: "Grupo A" },
+  PER: { name: "Perú", code: "PER", group: "Grupo A" },
+  CHI: { name: "Chile", code: "CHI", group: "Grupo A" },
+  CAN: { name: "Canadá", code: "CAN", group: "Grupo A" },
+  MEX: { name: "México", code: "MEX", group: "Grupo B" },
+  ECU: { name: "Ecuador", code: "ECU", group: "Grupo B" },
+  VEN: { name: "Venezuela", code: "VEN", group: "Grupo B" },
+  JAM: { name: "Jamaica", code: "JAM", group: "Grupo B" },
+  USA: { name: "Estados Unidos", code: "USA", group: "Grupo C" },
+  URU: { name: "Uruguay", code: "URU", group: "Grupo C" },
+  PAN: { name: "Panamá", code: "PAN", group: "Grupo C" },
+  BOL: { name: "Bolivia", code: "BOL", group: "Grupo C" },
+  BRA: { name: "Brasil", code: "BRA", group: "Grupo D" },
+  COL: { name: "Colombia", code: "COL", group: "Grupo D" },
+  PAR: { name: "Paraguay", code: "PAR", group: "Grupo D" },
+  CRC: { name: "Costa Rica", code: "CRC", group: "Grupo D" },
+  HON: { name: "Honduras", code: "HON", group: "Play-in / Extras" },
+  TRI: { name: "Trinidad y Tobago", code: "TRI", group: "Play-in / Extras" }
+};
+
+export function getCopaAmericaStickerCodes(): string[] {
+  const codes: string[] = [];
+  
+  // Introducción (INTR1 to INTR4)
+  for (let i = 1; i <= 4; i++) codes.push(`INTR${i}`);
+  
+  // Sedes (HCI1 to HCI14)
+  for (let i = 1; i <= 14; i++) codes.push(`HCI${i}`);
+  
+  // Selecciones
+  FOR_TEAMS: for (const team of Object.keys(COPA_AMERICA_TEAMS)) {
+    for (let i = 1; i <= 22; i++) {
+      codes.push(`${team}${i}`);
+    }
+  }
+  
+  // Leyendas (LEG1 to LEG18)
+  for (let i = 1; i <= 18; i++) codes.push(`LEG${i}`);
+  
+  // Roll of Honour (ROH1 to ROH2)
+  for (let i = 1; i <= 2; i++) codes.push(`ROH${i}`);
+  
+  // Extra Stickers (EXT1 to EXT16)
+  for (let i = 1; i <= 16; i++) codes.push(`EXT${i}`);
+  
+  return codes;
+}
+
+export function buildCopaAmericaInitialStickers(): StickerState[] {
+  const list: StickerState[] = [];
+  const allCodes = getCopaAmericaStickerCodes();
+  
+  const explicitFaltantes = ['ARG17', 'BRA10', 'MEX4', 'INTR1', 'LEG2'];
+  const explicitRepetidas = ['ARG4', 'MEX12', 'BRA7', 'USA5', 'HCI3'];
+  
+  const tengos = new Set<string>();
+  
+  // Argentina owned: 15 other ARG codes (ARG1 to ARG22 without 17 & 4, which is 20 total. Let's make 15 owned + 1 repetida = 16 owned)
+  const argTengos = ['ARG1', 'ARG2', 'ARG3', 'ARG5', 'ARG6', 'ARG7', 'ARG8', 'ARG9', 'ARG10', 'ARG11', 'ARG12', 'ARG13', 'ARG14', 'ARG15', 'ARG16'];
+  argTengos.forEach(c => tengos.add(c));
+  
+  // Bulk tengos to reach 120 more owned (total 140 main owned)
+  const bulkTengos = [
+    ...Array.from({ length: 22 }, (_, i) => `PER${i + 1}`),
+    ...Array.from({ length: 22 }, (_, i) => `CHI${i + 1}`),
+    ...Array.from({ length: 22 }, (_, i) => `CAN${i + 1}`),
+    ...Array.from({ length: 22 }, (_, i) => `VEN${i + 1}`),
+    ...Array.from({ length: 22 }, (_, i) => `JAM${i + 1}`),
+    ...Array.from({ length: 10 }, (_, i) => `BOL${i + 1}`)
+  ];
+  bulkTengos.forEach(c => tengos.add(c));
+  
+  // Extra stickers: exactly 4 of 16
+  const extraTengos = ['EXT1', 'EXT2', 'EXT3', 'EXT4'];
+  extraTengos.forEach(c => tengos.add(c));
+  
+  for (const code of allCodes) {
+    if (explicitFaltantes.includes(code)) {
+      list.push({ code, status: 'faltante' });
+    } else if (explicitRepetidas.includes(code)) {
+      list.push({ code, status: 'repetida' });
+    } else if (tengos.has(code)) {
+      list.push({ code, status: 'tengo' });
+    } else {
+      list.push({ code, status: 'faltante' });
+    }
+  }
+  
+  return list;
+}
+
+export const INITIAL_COPA_STICKERS: StickerState[] = buildCopaAmericaInitialStickers();
 
 export const SELECTIONS = [
   { code: 'MEX', name: 'México' },
@@ -94,7 +228,12 @@ export const INITIAL_USER: UserProfile = {
   badges: ['Coleccionista activo', 'Usuario confiable', 'Buen intercambiador'],
   activeAlbumId: 'mundial_2026',
   blockedUsers: [],
-  reportedUsers: []
+  reportedUsers: [],
+  minorModeActive: true,
+  adultName: 'Mariana',
+  adultRelation: 'Madre',
+  adultConfirmedAcc: true,
+  onlySafePointsActive: true
 };
 
 // GENERATE SOFI'S INITIAL STICKERS WITH PRECISE STATS:
@@ -199,7 +338,7 @@ export const INITIAL_COLLECTORS: NearbyCollector[] = [
     badges: ['Buen intercambiador', 'Usuario confiable'],
     isVerified: true,
     activeAlbumId: 'mundial_2026',
-    activityTime: 'Hace 5 min',
+    activityTime: 'Hace 10 min',
     stickers: {
       // Tiene repetidas: ARG17, BRA10, FWC11
       'ARG17': 'repetida',
@@ -222,7 +361,7 @@ export const INITIAL_COLLECTORS: NearbyCollector[] = [
     badges: ['Coleccionista activo'],
     isVerified: false,
     activeAlbumId: 'mundial_2026',
-    activityTime: 'Hace 15 min',
+    activityTime: 'Hace 25 min',
     stickers: {
       // Tiene repetidas: MEX4, ARG20
       'MEX4': 'repetida',
@@ -253,26 +392,83 @@ export const INITIAL_COLLECTORS: NearbyCollector[] = [
     }
   },
   {
-    id: 'mati_kiosquero',
-    name: 'Kiosco El Álbum',
-    avatar: '🏪',
-    neighborhood: 'Palermo',
-    distance: 0.8,
-    avgRating: 4.9,
-    exchangesCount: 142,
-    userType: 'kiosco',
-    badges: ['Punto Seguro', 'Usuario verificado'],
-    isVerified: true,
+    id: 'laura_collector',
+    name: 'Laura',
+    avatar: '👩',
+    neighborhood: 'Colegiales',
+    distance: 4.0,
+    avgRating: 4.6,
+    exchangesCount: 6,
+    userType: 'coleccionista',
+    badges: ['Usuario pacificador'],
+    isVerified: false,
     activeAlbumId: 'mundial_2026',
-    activityTime: 'Abierto ahora',
+    activityTime: 'Ayer',
     stickers: {
-      // Has some repetidas to behave as a trading base
-      'MEX4': 'repetida',
-      'ARG20': 'repetida',
+      // Tiene repetidas: ESP5, FRA10
+      'ESP5': 'repetida',
+      'FRA10': 'repetida',
+      // Le faltan: ARG4
+      'ARG4': 'faltante'
+    }
+  },
+  {
+    id: 'martina_copa',
+    name: 'Martina',
+    avatar: '👩',
+    neighborhood: 'Palermo',
+    distance: 1.2,
+    avgRating: 4.8,
+    exchangesCount: 12,
+    userType: 'coleccionista',
+    badges: ['Buen intercambiador', 'Usuario confiable'],
+    isVerified: true,
+    activeAlbumId: 'copa_america_2024',
+    activityTime: 'Hace 10 min',
+    stickers: {
       'ARG17': 'repetida',
       'BRA10': 'repetida',
-      'FWC11': 'repetida',
-      'CC3': 'repetida'
+      'LEG2': 'repetida',
+      'ARG4': 'faltante',
+      'MEX12': 'faltante'
+    }
+  },
+  {
+    id: 'juan_copa',
+    name: 'Juan',
+    avatar: '👦',
+    neighborhood: 'Belgrano',
+    distance: 3.0,
+    avgRating: 4.5,
+    exchangesCount: 8,
+    userType: 'coleccionista',
+    badges: ['Coleccionista activo'],
+    isVerified: false,
+    activeAlbumId: 'copa_america_2024',
+    activityTime: 'Hace 25 min',
+    stickers: {
+      'MEX4': 'repetida',
+      'INTR1': 'repetida',
+      'BRA7': 'faltante',
+      'USA5': 'faltante'
+    }
+  },
+  {
+    id: 'tomas_copa',
+    name: 'Tomás',
+    avatar: '🧑',
+    neighborhood: 'Recoleta',
+    distance: 2.5,
+    avgRating: 4.1,
+    exchangesCount: 3,
+    userType: 'coleccionista',
+    badges: ['Primer intercambio'],
+    isVerified: false,
+    activeAlbumId: 'copa_america_2024',
+    activityTime: 'Hace 1 hora',
+    stickers: {
+      'HCI5': 'repetida',
+      'COL8': 'faltante'
     }
   }
 ];
@@ -281,38 +477,87 @@ export const SUGGESTED_SAFE_POINTS: SafePoint[] = [
   {
     id: 'sp_1',
     name: 'Kiosco El Álbum',
-    type: 'kiosco',
+    type: 'Kiosco adherido',
     address: 'Av. Santa Fe 3432, Palermo',
-    distance: '0,8 km',
+    neighborhood: 'Palermo',
+    distance: '800 m',
+    distanceNum: 0.8,
+    verificationState: 'verificado',
+    exchangesCount: 128,
+    safetyPercent: 96,
     rating: 4.9,
-    hours: 'Lunes a Sábado, 8:00 a 21:00'
+    reportsCount: 0,
+    lastActivity: 'hace 2 días',
+    hours: 'Lunes a Sábado, 8:00 a 21:00',
+    recommendations: 'Este punto es recomendable porque tiene muchos intercambios realizados, alta calificación y no registra reportes recientes.'
   },
   {
     id: 'sp_2',
-    name: 'Plaza Unidad Latinoamericana',
-    type: 'plaza',
-    address: 'Costa Rica & Medrano, Palermo',
-    distance: '1,1 km',
-    rating: 4.5,
-    hours: 'Público, recomendado fines de semana 14:00 a 18:00'
+    name: 'Club Palermo',
+    type: 'Club',
+    address: 'Fitz Roy 2238, Palermo',
+    neighborhood: 'Palermo',
+    distance: '1,4 km',
+    distanceNum: 1.4,
+    verificationState: 'verificado',
+    exchangesCount: 87,
+    safetyPercent: 94,
+    rating: 4.8,
+    reportsCount: 0,
+    lastActivity: 'hace 1 día',
+    hours: 'Miércoles y Viernes, 16:00 a 20:00',
+    recommendations: 'Este club ofrece un ambiente familiar y seguro, con excelente reputación de intercambios coordinados y sin reportes.'
   },
   {
     id: 'sp_3',
-    name: 'Club Atlético Palermo',
-    type: 'club',
-    address: 'Fitz Roy 2238, Palermo',
-    distance: '1,5 km',
-    rating: 5.0,
-    hours: 'Miércoles y Viernes, 16:00 a 20:00'
+    name: 'Alto Palermo',
+    type: 'Centro comercial',
+    address: 'Av. Santa Fe 3253, Palermo',
+    neighborhood: 'Palermo',
+    distance: '2 km',
+    distanceNum: 2.0,
+    verificationState: 'comunidad',
+    exchangesCount: 64,
+    safetyPercent: 89,
+    rating: 4.6,
+    reportsCount: 1,
+    lastActivity: 'hace 5 días',
+    hours: 'Lunes a Domingo, 10:00 a 22:00',
+    recommendations: 'Recomendado por la comunidad. Cuenta con vigilancia permanente, cámaras de seguridad y excelente iluminación.'
   },
   {
     id: 'sp_4',
-    name: 'Cafetería El Faro',
-    type: 'otros',
-    address: 'Gorriti 4120, Palermo',
-    distance: '0,9 km',
-    rating: 4.7,
-    hours: 'Todos los días, 7:00 a 20:00'
+    name: 'Plaza Armenia',
+    type: 'Plaza concurrida',
+    address: 'Costa Rica & Armenia, Palermo',
+    neighborhood: 'Palermo',
+    distance: '1,1 km',
+    distanceNum: 1.1,
+    verificationState: 'comunidad',
+    exchangesCount: 35,
+    safetyPercent: 82,
+    rating: 4.4,
+    reportsCount: 1,
+    lastActivity: 'hace 3 días',
+    hours: 'Recomendado fines de semana, de 14:00 a 19:00',
+    recommendations: 'Espacio público muy concurrido. Se aconseja realizar los encuentros durante las horas de luz solar y en sectores poblados.'
+  },
+  {
+    id: 'sp_5',
+    name: 'Café Punto Norte',
+    type: 'Cafetería',
+    address: 'Av. Cabildo 1820, Belgrano',
+    neighborhood: 'Belgrano',
+    distance: '3 km',
+    distanceNum: 3.0,
+    verificationState: 'no_verificado',
+    exchangesCount: 12,
+    safetyPercent: 71,
+    rating: 4.1,
+    reportsCount: 2,
+    lastActivity: 'hace 8 días',
+    hours: 'Todos los días, 8:00 a 20:00',
+    recommendations: 'Punto no verificado con algunos reportes de desorganización en los accesos. Se recomienda asistir acompañado.'
   }
 ];
 
@@ -404,28 +649,108 @@ export function calculateMatches(
     );
 
     let matchLevel: 'alta' | 'media' | 'baja' = 'baja';
+    let compatibilityPercent = 20;
+
+    const isKiosco = collector.userType === 'kiosco' || collector.userType === 'club';
+
     if (theyOfferToUser.length > 0 && userOffersToThem.length > 0) {
       matchLevel = 'alta';
+      if (collector.id === 'martina_collector') {
+        compatibilityPercent = 92;
+      } else if (collector.id === 'juan_collector') {
+        compatibilityPercent = 89;
+      } else {
+        const totalTradeables = theyOfferToUser.length + userOffersToThem.length;
+        compatibilityPercent = Math.min(100, 80 + totalTradeables * 3);
+      }
     } else if (theyOfferToUser.length > 0 || userOffersToThem.length > 0) {
       matchLevel = 'media';
+      if (collector.id === 'tomas_collector') {
+        compatibilityPercent = 61;
+      } else {
+        compatibilityPercent = Math.min(79, 50 + theyOfferToUser.length * 10 + userOffersToThem.length * 5);
+      }
+    } else {
+      matchLevel = 'baja';
+      if (collector.id === 'laura_collector') {
+        compatibilityPercent = 35;
+      } else {
+        compatibilityPercent = 25;
+      }
     }
 
-    const lvlScore = matchLevel === 'alta' ? 300 : matchLevel === 'media' ? 100 : 0;
-    const countScore = (theyOfferToUser.length + userOffersToThem.length) * 15;
-    const distScore = Math.max(0, 10 - collector.distance) * 8;
-    const ratingScore = collector.avgRating * 5;
-    const verifiedScore = collector.isVerified ? 30 : 0;
+    if (isKiosco) {
+      // High score for being a secure station point
+      matchLevel = 'alta';
+      compatibilityPercent = 95;
+    }
 
-    const matchScore = lvlScore + countScore + distScore + ratingScore + verifiedScore;
+    // Explanations & Suggested Trades
+    let explanation = '';
+    let suggestedTrade = '';
+
+    if (isKiosco) {
+      explanation = `Punto Seguro recomendado de Palermo. Excelente lugar vigilado para coordinar intercambios de figuritas de forma protegida.`;
+      suggestedTrade = `Llevá tus figuritas repetidas a ${collector.name}. Podés usar las mesas del local para reunirte de forma segura y revisar el stock general de figuritas libres de canje.`;
+    } else {
+      if (matchLevel === 'alta') {
+        explanation = `“${collector.name} es una muy buena opción para cambiar porque tiene ${theyOfferToUser.length} ${theyOfferToUser.length === 1 ? 'figurita' : 'figuritas'} que te faltan y vos tenés ${userOffersToThem.length} ${userOffersToThem.length === 1 ? 'que necesita' : 'que necesita'}.”`;
+        suggestedTrade = `Vos entregás ${userOffersToThem.join(' y ')}. ${collector.name} entrega ${theyOfferToUser.join(' y ')}.`;
+      } else if (matchLevel === 'media') {
+        explanation = `“Esta persona tiene figuritas que te faltan, pero falta encontrar una repetida tuya que le sirva.”`;
+        if (theyOfferToUser.length > 0) {
+          suggestedTrade = `${collector.name} te puede dar ${theyOfferToUser.join(', ')}. Podés proponerle compensación con otras valiosas o coordinar un trueque indirecto.`;
+        } else {
+          suggestedTrade = `Le podés ofrecer ${userOffersToThem.join(', ')}. Escribile para ver si tiene otras repetidas que no cargó aún.`;
+        }
+      } else {
+        explanation = `“Comparten el mismo álbum, pero todavía hay pocas figuritas compatibles.”`;
+        suggestedTrade = `No hay coincidencia directa. Coordinen con ${collector.name} para ver si avanza su álbum o si consiguen nuevas repetidas servibles.`;
+      }
+    }
+
+    // Dynamic scale scoring helper (will be used inside lists)
+    const lvlScore = matchLevel === 'alta' ? 400 : matchLevel === 'media' ? 200 : 50;
+    const countScore = (theyOfferToUser.length + userOffersToThem.length) * 15;
+    const distScore = Math.max(0, 10 - collector.distance) * 10;
+    const ratingScore = collector.avgRating * 8;
+    const verifiedScore = collector.isVerified ? 40 : 0;
+
+    const matchScore = compatibilityPercent * 10 + lvlScore + countScore + distScore + ratingScore + verifiedScore;
 
     return {
       collector,
       matchLevel,
       userOffersToThem,
       theyOfferToUser,
-      matchScore
+      matchScore,
+      compatibilityPercent,
+      explanation,
+      suggestedTrade
     };
   });
 
-  return results.sort((a, b) => b.matchScore - a.matchScore);
+  return results.sort((a, b) => {
+    // 1. Compatibility percent (descending)
+    if (b.compatibilityPercent !== a.compatibilityPercent) {
+      return b.compatibilityPercent - a.compatibilityPercent;
+    }
+    // 2. They offer count (descending)
+    if (b.theyOfferToUser.length !== a.theyOfferToUser.length) {
+      return b.theyOfferToUser.length - a.theyOfferToUser.length;
+    }
+    // 3. User offers count (descending)
+    if (b.userOffersToThem.length !== a.userOffersToThem.length) {
+      return b.userOffersToThem.length - a.userOffersToThem.length;
+    }
+    // 4. Distance (ascending)
+    if (a.collector.distance !== b.collector.distance) {
+      return a.collector.distance - b.collector.distance;
+    }
+    // 5. Avg rating (descending)
+    if (b.collector.avgRating !== a.collector.avgRating) {
+      return b.collector.avgRating - a.collector.avgRating;
+    }
+    return 0;
+  });
 }

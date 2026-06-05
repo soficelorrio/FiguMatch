@@ -14,6 +14,13 @@ export interface UserProfile {
   activeAlbumId: string;
   blockedUsers: string[]; // List of user IDs blocked
   reportedUsers: string[]; // List of user IDs reported
+  
+  // Modo Menor Acompañado fields:
+  minorModeActive: boolean;
+  adultName?: string;
+  adultRelation?: string;
+  adultConfirmedAcc?: boolean;
+  onlySafePointsActive?: boolean;
 }
 
 export type AlbumCategory = 'Futbol' | 'Animacion' | 'Anime' | 'Mundo Geek' | 'Otros';
@@ -55,6 +62,9 @@ export interface MatchResult {
   userOffersToThem: string[]; // stickers you have as 'repetida' that they have as 'faltante'
   theyOfferToUser: string[]; // stickers they have as 'repetida' that you have as 'faltante'
   matchScore: number; // helper score to rank
+  compatibilityPercent: number; // calculated compatibility percent
+  explanation: string; // human-readable explanation of compatibility
+  suggestedTrade?: string; // suggestion text for custom trade
 }
 
 export interface ChatMessage {
@@ -93,9 +103,17 @@ export interface TradeProposal {
 export interface SafePoint {
   id: string;
   name: string;
-  type: 'kiosco' | 'club' | 'plaza' | 'centro_comercial' | 'otros';
+  type: string; // e.g., 'Kiosco adherido' | 'Club' | 'Colegio' | 'Centro comercial' | 'Cafetería' | 'Plaza concurrida' | 'Punto público recomendado'
   address: string;
-  distance: string;
+  neighborhood: string; // e.g., 'Palermo'
+  distance: string; // e.g., '800 m'
+  distanceNum: number; // e.g., 0.8 for calculations/sorting
+  verificationState: 'verificado' | 'no_verificado' | 'comunidad'; // 'verificado' | 'no_verificado' | 'comunidad'
+  exchangesCount: number;
+  safetyPercent: number;
   rating: number;
+  reportsCount: number;
+  lastActivity: string;
   hours: string;
+  recommendations?: string;
 }

@@ -1,15 +1,15 @@
-import { Home, BookOpen, Users, MessageSquare, User } from 'lucide-react';
+import { Home, BookOpen, Users, MessageSquare, User, ShieldCheck } from 'lucide-react';
 
 interface NavItem {
-  id: 'inicio' | 'album' | 'matches' | 'chat' | 'perfil';
+  id: 'inicio' | 'album' | 'matches' | 'chat' | 'perfil' | 'puntos_seguros';
   label: string;
   icon: any;
   badge?: number;
 }
 
 interface BottomNavProps {
-  activeTab: 'inicio' | 'album' | 'matches' | 'chat' | 'perfil';
-  setActiveTab: (tab: 'inicio' | 'album' | 'matches' | 'chat' | 'perfil') => void;
+  activeTab: 'inicio' | 'album' | 'matches' | 'chat' | 'perfil' | 'puntos_seguros';
+  setActiveTab: (tab: 'inicio' | 'album' | 'matches' | 'chat' | 'perfil' | 'puntos_seguros') => void;
   unreadCount?: number;
   matchCount?: number;
 }
@@ -19,9 +19,11 @@ export default function BottomNav({ activeTab, setActiveTab, unreadCount = 0, ma
     { id: 'inicio', label: 'Inicio', icon: Home },
     { id: 'album', label: 'Mi Álbum', icon: BookOpen },
     { id: 'matches', label: 'Matches', icon: Users, badge: matchCount },
+    { id: 'puntos_seguros', label: 'Puntos Seguros', icon: ShieldCheck },
     { id: 'chat', label: 'Chats', icon: MessageSquare, badge: unreadCount },
     { id: 'perfil', label: 'Mi Perfil', icon: User },
   ];
+
 
   return (
     <nav className="w-full h-full bg-white px-2 flex justify-around items-center">

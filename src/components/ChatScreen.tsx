@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChatMessage, NearbyCollector } from '../types';
-import { Send, ArrowLeft, ShieldAlert, Sparkles, Smile, Radio } from 'lucide-react';
+import { ChatMessage, NearbyCollector, UserProfile } from '../types';
+import { Send, ArrowLeft, ShieldAlert, Sparkles, Smile, Radio, ShieldCheck } from 'lucide-react';
 
 interface ChatScreenProps {
   collector: NearbyCollector;
@@ -9,6 +9,7 @@ interface ChatScreenProps {
   onBack: () => void;
   onSendMessage: (text: string) => void;
   onSimulateResponse?: (collectorId: string, receivedText: string) => void;
+  userProfile?: UserProfile;
 }
 
 const QUICK_MESSAGES = [
@@ -25,7 +26,8 @@ export default function ChatScreen({
   currentUserId,
   onBack,
   onSendMessage,
-  onSimulateResponse
+  onSimulateResponse,
+  userProfile
 }: ChatScreenProps) {
   const [inputText, setInputText] = useState('');
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -47,6 +49,17 @@ export default function ChatScreen({
       }, 1500);
     }
   };
+
+  // Minor mode specific quick responses (Rule 9)
+  const activeQuickMessages = userProfile?.minorModeActive
+    ? [
+        'Lo consulto con un adulto. 👵',
+        '¿Podemos encontrarnos en un punto de encuentro seguro? 🏪',
+        'Tengo que ir con un adulto acompañado. 🛡️',
+        'Hola, me interesa cambiar. 👋',
+        'Intercambio realizado. ✅'
+      ]
+    : QUICK_MESSAGES;
 
   return (
     <div className="flex flex-col h-[75vh] px-1 relative">
@@ -79,13 +92,25 @@ export default function ChatScreen({
         </div>
       </div>
 
-      {/* Safety Banner */}
-      <div className="bg-amber-50 text-amber-800 text-[10px] p-2.5 rounded-lg border border-amber-100/50 flex gap-2 items-start flex-shrink-0 my-2">
-        <ShieldAlert size={14} className="text-amber-600 stroke-[2.5] flex-shrink-0" />
-        <p className="leading-normal font-medium">
-          <strong>Protección:</strong> No compartas dirección exacta, emails ni WhatsApp. Coordiná e interactuá con seguridad dentro del chat.
-        </p>
-      </div>
+      {/* Safety Banner (Persistent in Chat) */}
+      {userProfile?.minorModeActive ? (
+        <div id="minor-chat-persistent-banner" className="bg-amber-50 text-amber-900 text-[10px] p-3 rounded-2xl border-2 border-amber-200/80 flex gap-2.5 items-start flex-shrink-0 my-2 animate-fadeIn text-left">
+          <ShieldAlert size={16} className="text-amber-600 stroke-[2.5] flex-shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <p className="font-extrabold leading-tight text-amber-800">🛡️ Modo Menor Acompañado Activo</p>
+            <p className="leading-snug font-bold">
+              Todo canje debe coordinarse junto a tu tutor responsable <strong>({userProfile.adultName || 'Mariana'})</strong> y concretarse en un punto seguro de Palermo.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-amber-50 text-amber-800 text-[10px] p-2.5 rounded-lg border border-amber-100/50 flex gap-2 items-start flex-shrink-0 my-2">
+          <ShieldAlert size={14} className="text-amber-600 stroke-[2.5] flex-shrink-0" />
+          <p className="leading-normal font-medium">
+            <strong>Protección:</strong> No compartas dirección exacta, emails ni WhatsApp. Coordiná e interactuá con seguridad dentro del chat.
+          </p>
+        </div>
+      )}
 
       {/* Message log list */}
       <div className="flex-1 overflow-y-auto space-y-2.5 py-2 pr-1 scrollbar-thin">
@@ -123,7 +148,7 @@ export default function ChatScreen({
           Mensajes Rápidos sugeridos:
         </label>
         <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
-          {QUICK_MESSAGES.map((textOption) => (
+          {activeQuickMessages.map((textOption) => (
             <button
               key={textOption}
               onClick={() => handleSend(textOption)}

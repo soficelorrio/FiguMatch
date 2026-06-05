@@ -30,7 +30,11 @@ export default function ProfileCreationScreen({
   const [selectedAvatar, setSelectedAvatar] = useState('👧');
   const [neighborhood, setNeighborhood] = useState('Palermo');
   const [userType, setUserType] = useState<UserType>('coleccionista');
-  const [isSupervised, setIsSupervised] = useState(true);
+  const [minorModeActive, setMinorModeActive] = useState(true);
+  const [adultName, setAdultName] = useState('Mariana');
+  const [adultRelation, setAdultRelation] = useState('Madre');
+  const [adultConfirmedAcc, setAdultConfirmedAcc] = useState(true);
+  const [onlySafePointsActive, setOnlySafePointsActive] = useState(true);
 
   const handleNext = () => {
     if (!name.trim()) return;
@@ -38,6 +42,9 @@ export default function ProfileCreationScreen({
     const badges = ['Nuevo ingresante'];
     if (userType === 'padre_madre') {
       badges.push('Padre Colaborador');
+    }
+    if (minorModeActive) {
+      badges.push('Cuenta Supervisada');
     }
 
     const newProfile: UserProfile = {
@@ -47,13 +54,20 @@ export default function ProfileCreationScreen({
       avatar: selectedAvatar,
       neighborhood,
       userType,
-      isSupervised,
+      isSupervised: minorModeActive,
       avgRating: 5.0, // starts flat
       exchangesCount: 0,
       badges,
-      activeAlbumId: 'mundial_2026', // defaults to Mundial de Futbol
+      activeAlbumId: 'mundial_2026', // defaults to Panini Mundial 2026
       blockedUsers: [],
-      reportedUsers: []
+      reportedUsers: [],
+      
+      // Modo Menor Acompañado:
+      minorModeActive,
+      adultName: minorModeActive ? adultName.trim() : undefined,
+      adultRelation: minorModeActive ? adultRelation : undefined,
+      adultConfirmedAcc: minorModeActive ? adultConfirmedAcc : undefined,
+      onlySafePointsActive: minorModeActive ? onlySafePointsActive : undefined
     };
 
     onProfileCreated(newProfile);
@@ -149,7 +163,7 @@ export default function ProfileCreationScreen({
               onClick={() => {
                 setUserType(type.id as UserType);
                 if (type.id === 'kiosco' || type.id === 'club') {
-                  setIsSupervised(false);
+                  setMinorModeActive(false);
                 }
               }}
               className={`p-3 text-left rounded-2xl border-2 transition duration-200 ${
@@ -165,28 +179,128 @@ export default function ProfileCreationScreen({
         </div>
       </div>
 
-      {/* Supervised toggle for minors */}
-      <div className="p-4 bg-amber-50/50 border border-amber-100 rounded-2xl space-y-2.5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Shield size={16} className="text-amber-600" />
-            <span className="text-xs font-bold text-slate-800">¿Cuenta Supervisada?</span>
-          </div>
-          <input
-            type="checkbox"
-            checked={isSupervised}
-            onChange={(e) => setIsSupervised(e.target.checked)}
-            className="rounded border-amber-300 text-amber-600 focus:ring-amber-500 h-4.5 w-4.5 accent-amber-600"
-          />
+      {/* Modo Menor Acompañado Setup Block */}
+      <div className="bg-slate-50 border border-slate-100 p-4 rounded-3xl space-y-4">
+        <div className="space-y-1">
+          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+            <Shield size={15} className="text-indigo-600" />
+            ¿Esta cuenta será usada por un menor de edad?
+          </label>
+          <p className="text-[10px] text-slate-400 leading-normal">
+            Buscamos proteger a los chicos y adolescentes que intercambian figuritas en sus barrios.
+          </p>
         </div>
-        <p className="text-[10px] text-amber-700/80 leading-normal">
-          Para menores de edad, se activa el modo de supervisión parental. El chat y los encuentros seguros recuerdan siempre implicar a un tutor.
-        </p>
+
+        {/* Buttons for Options */}
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            id="btn-minor-mode-yes"
+            onClick={() => setMinorModeActive(true)}
+            className={`py-3 px-3 rounded-xl text-left border-2 transition text-xs font-bold ${
+              minorModeActive
+                ? 'border-indigo-600 bg-indigo-50/60 text-indigo-900'
+                : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-100'
+            }`}
+          >
+            <span className="block text-sm mb-0.5">👦 Yes</span>
+            Sí, activar Modo Menor Acompañado
+          </button>
+          <button
+            type="button"
+            id="btn-minor-mode-no"
+            onClick={() => setMinorModeActive(false)}
+            className={`py-3 px-3 rounded-xl text-left border-2 transition text-xs font-bold ${
+              !minorModeActive
+                ? 'border-slate-800 bg-slate-900 text-white'
+                : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-100'
+            }`}
+          >
+            <span className="block text-sm mb-0.5">👤 No</span>
+            No, continuar como cuenta normal
+          </button>
+        </div>
+
+        {/* Display when minor mode active */}
+        {minorModeActive && (
+          <div className="space-y-3.5 pt-3.5 border-t border-dashed border-slate-200 animate-fadeIn">
+            {/* Advice message in requirements */}
+            <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-2xl text-[10.5px] text-amber-900 font-semibold leading-relaxed">
+              ⚠️ <strong>Mensaje de seguridad:</strong> Para mayor seguridad, los intercambios deberán coordinarse con acompañamiento de un adulto responsable y preferentemente en puntos seguros.
+            </div>
+
+            {/* Adult Responsible fields */}
+            <div className="space-y-2.5">
+              <p className="text-[10px] font-black uppercase text-indigo-600 tracking-wider">
+                Datos del Adulto Responsable (Simulado)
+              </p>
+
+              {/* Adult Name input */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-slate-500">Nombre o apodo del adulto</span>
+                <input
+                  id="adult-name-input"
+                  type="text"
+                  value={adultName}
+                  onChange={(e) => setAdultName(e.target.value)}
+                  placeholder="Ej: Mariana"
+                  className="w-full bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-700 font-sans"
+                />
+              </div>
+
+              {/* Adult relation select */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-slate-500">Relación con el menor</span>
+                <select
+                  id="adult-relation-select"
+                  value={adultRelation}
+                  onChange={(e) => setAdultRelation(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-700"
+                >
+                  <option value="Madre">Madre</option>
+                  <option value="Padre">Padre</option>
+                  <option value="Tutor">Tutor</option>
+                  <option value="Familiar">Familiar u otro</option>
+                </select>
+              </div>
+
+              {/* Confirmation of accompaniment checkbox */}
+              <label className="flex items-start gap-2 bg-white p-2 px-2.5 rounded-xl border border-slate-200 cursor-pointer">
+                <input
+                  id="adult-confirmed-checkbox"
+                  type="checkbox"
+                  checked={adultConfirmedAcc}
+                  onChange={(e) => setAdultConfirmedAcc(e.target.checked)}
+                  className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4 mt-0.5 accent-indigo-600"
+                />
+                <span className="text-[10px] font-bold text-slate-600 leading-normal">
+                  Confirmo compromiso de acompañamiento en los encuentros.
+                </span>
+              </label>
+
+              {/* Only Safe Points toggle option */}
+              <label className="flex items-start gap-2 bg-indigo-50/50 p-2 px-2.5 rounded-xl border border-indigo-100 cursor-pointer">
+                <input
+                  id="only-safe-points-checkbox"
+                  type="checkbox"
+                  checked={onlySafePointsActive}
+                  onChange={(e) => setOnlySafePointsActive(e.target.checked)}
+                  className="rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4 mt-0.5 accent-indigo-600"
+                />
+                <div className="text-[10px] leading-normal font-bold">
+                  <span className="text-indigo-900 block font-black">🏪 Permitir solo intercambios en puntos seguros</span>
+                  <span className="text-indigo-700 font-medium. opacity-80 block text-[9.5px]">Prioriza locales y plazas vigiladas en Palermo.</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        )}
       </div>
 
       <button
         onClick={handleNext}
-        className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-xs"
+        id="btn-confirm-profile"
+        className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-xs cursor-pointer"
       >
         <span>Confirmar y Configurar Álbum</span>
         <ArrowRight size={16} />

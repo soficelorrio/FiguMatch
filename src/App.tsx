@@ -16,7 +16,8 @@ import {
   INITIAL_CHATS,
   INITIAL_TRADES,
   calculateMatches,
-  INITIAL_ALBUMS
+  INITIAL_ALBUMS,
+  SUGGESTED_SAFE_POINTS
 } from './data';
 
 // Component imports
@@ -32,6 +33,7 @@ import ChatScreen from './components/ChatScreen';
 import ProposalScreen from './components/ProposalScreen';
 import ProfileViewScreen from './components/ProfileViewScreen';
 import SecurityScreen from './components/SecurityScreen';
+import SafePointsScreen from './components/SafePointsScreen';import { SafePoint } from './types';
 
 import {
   MessageSquare,
@@ -51,12 +53,13 @@ const STORAGE_KEYS = {
   STICKERS: 'figumatch_stickers_list',
   CHATS: 'figumatch_chats_list',
   TRADES: 'figumatch_trades_list',
-  COLLECTORS: 'figumatch_collectors'
+  COLLECTORS: 'figumatch_collectors',
+  SAFE_POINTS: 'figumatch_safe_points_list'
 };
 
 export default function App() {
   // Navigation states
-  const [activeTab, setActiveTab] = useState<'inicio' | 'album' | 'matches' | 'chat' | 'perfil'>('inicio');
+  const [activeTab, setActiveTab] = useState<'inicio' | 'album' | 'matches' | 'chat' | 'perfil' | 'puntos_seguros'>('inicio');
   const [subView, setSubView] = useState<{
     type: 'welcome' | 'auth' | 'create_profile' | 'select_album' | 'match_detail' | 'chat_room' | 'trade_offer' | 'security_center';
     paramId?: string; // collectorId
@@ -68,6 +71,8 @@ export default function App() {
   const [chats, setChats] = useState<ChatMessage[]>([]);
   const [trades, setTrades] = useState<TradeProposal[]>([]);
   const [collectors, setCollectors] = useState<NearbyCollector[]>([]);
+  const [safePoints, setSafePoints] = useState<SafePoint[]>([]);
+  const [preselectedPointName, setPreselectedPointName] = useState<string | null>(null);
 
   // Simulated push notifications state
   const [notifications, setNotifications] = useState<string[]>([
@@ -87,6 +92,7 @@ export default function App() {
       const storedChats = localStorage.getItem(STORAGE_KEYS.CHATS);
       const storedTrades = localStorage.getItem(STORAGE_KEYS.TRADES);
       const storedCollectors = localStorage.getItem(STORAGE_KEYS.COLLECTORS);
+      const storedSafePoints = localStorage.getItem(STORAGE_KEYS.SAFE_POINTS);
 
       if (storedUser) {
         setUserProfile(JSON.parse(storedUser));
@@ -103,6 +109,7 @@ export default function App() {
       setChats(storedChats ? JSON.parse(storedChats) : INITIAL_CHATS);
       setTrades(storedTrades ? JSON.parse(storedTrades) : INITIAL_TRADES);
       setCollectors(storedCollectors ? JSON.parse(storedCollectors) : INITIAL_COLLECTORS);
+      setSafePoints(storedSafePoints ? JSON.parse(storedSafePoints) : SUGGESTED_SAFE_POINTS);
     } catch (e) {
       console.error('Failed reading storage defaults', e);
       // Fallback
@@ -111,6 +118,7 @@ export default function App() {
       setChats(INITIAL_CHATS);
       setTrades(INITIAL_TRADES);
       setCollectors(INITIAL_COLLECTORS);
+      setSafePoints(SUGGESTED_SAFE_POINTS);
     }
   }, []);
 
@@ -252,7 +260,73 @@ export default function App() {
     addNotification(`🤝 Enviasta propuesta de trueque a ${proposal.receiverName}.`);
   };
 
-  const handleUpdateProposalStatus = (id: string, newStatus: TradeStatus, rating?: number) => {
+  const handleUpdateProposalStatus = (
+    id: string,
+    newStatus: TradeStatus,
+    rating?: number,
+    safePointRating?: { stars: number; experienceText: string }
+  ) => {
+    // Rule 7: Increment exchanges count in safe points database if trade is completed ('realizado')
+    if (newStatus === 'realizado') {
+      const proposal = trades.find((p) => p.id === id);
+      if (proposal && proposal.safePointName) {
+        setSafePoints((currentPts) => {
+          let found = false;
+          const updatedPts = currentPts.map((sp) => {
+            if (sp.name === proposal.safePointName) {
+              found = true;
+              return {
+                ...sp,
+                exchangesCount: sp.exchangesCount + 1,
+                lastActivity: 'intercambio concretado hace unos instantes'
+              };
+            }
+            return sp;
+          });
+          if (found) {
+            persistState(STORAGE_KEYS.SAFE_POINTS, updatedPts);
+          }
+          return updatedPts;
+        });
+      }
+    }
+
+    // Dynamic rating evaluation for safe point
+    if (safePointRating) {
+      const proposal = trades.find((p) => p.id === id);
+      if (proposal && proposal.safePointName) {
+        setSafePoints((currentPts) => {
+          const updatedPts = currentPts.map((sp) => {
+            if (sp.name === proposal.safePointName) {
+              const divisor = sp.exchangesCount || 1;
+              const oldTotalSum = sp.rating * Math.max(0, sp.exchangesCount - 1);
+              const nextRating = parseFloat(((oldTotalSum + safePointRating.stars) / divisor).toFixed(1));
+
+              let safetyAdjustment = 0;
+              if (safePointRating.experienceText === 'Mala') {
+                safetyAdjustment = -10;
+              } else if (safePointRating.experienceText === 'Muy buena') {
+                safetyAdjustment = 2;
+              } else if (safePointRating.experienceText === 'Buena') {
+                safetyAdjustment = 1;
+              }
+              const nextSafety = Math.min(100, Math.max(15, sp.safetyPercent + safetyAdjustment));
+
+              return {
+                ...sp,
+                rating: nextRating,
+                safetyPercent: nextSafety,
+                lastActivity: 'calificado por usuario hace unos instantes'
+              };
+            }
+            return sp;
+          });
+          persistState(STORAGE_KEYS.SAFE_POINTS, updatedPts);
+          return updatedPts;
+        });
+      }
+    }
+
     const updated = trades.map((t) => {
       if (t.id === id) {
         const changes: Partial<TradeProposal> = { status: newStatus };
@@ -285,6 +359,59 @@ export default function App() {
     });
     setCollectors(updatedCollectors);
     persistState(STORAGE_KEYS.COLLECTORS, updatedCollectors);
+  };
+
+  // Safe Points action handlers
+  const handleReportSafePoint = (pointId: string, reason: string) => {
+    const updated = safePoints.map((sp) => {
+      if (sp.id === pointId) {
+        const nextReports = sp.reportsCount + 1;
+        // Deduct 15% safety per report
+        const nextSafety = Math.max(15, sp.safetyPercent - 15);
+        return {
+          ...sp,
+          reportsCount: nextReports,
+          safetyPercent: nextSafety,
+          lastActivity: `reportado (${reason}) hace unos instantes`
+        };
+      }
+      return sp;
+    });
+    setSafePoints(updated);
+    persistState(STORAGE_KEYS.SAFE_POINTS, updated);
+    addNotification(`⚠️ Reporte registrado para punto seguro. Calificación de seguridad recalculada.`);
+  };
+
+  const handleRateSafePointDirectly = (pointId: string, stars: number, experienceText: string) => {
+    const updated = safePoints.map((sp) => {
+      if (sp.id === pointId) {
+        const nextExchanges = sp.exchangesCount + 1;
+        const nextRating = parseFloat(
+          ((sp.rating * sp.exchangesCount + stars) / nextExchanges).toFixed(1)
+        );
+        let safetyAdjustment = 0;
+        if (experienceText === 'Mala') {
+          safetyAdjustment = -10;
+        } else if (experienceText === 'Muy buena') {
+          safetyAdjustment = 2;
+        } else if (experienceText === 'Buena') {
+          safetyAdjustment = 1;
+        }
+        const nextSafety = Math.min(105, Math.max(15, sp.safetyPercent + safetyAdjustment));
+
+        return {
+          ...sp,
+          rating: nextRating,
+          exchangesCount: nextExchanges,
+          safetyPercent: nextSafety > 100 ? 100 : nextSafety,
+          lastActivity: 'calificado hace unos instantes'
+        };
+      }
+      return sp;
+    });
+    setSafePoints(updated);
+    persistState(STORAGE_KEYS.SAFE_POINTS, updated);
+    addNotification(`⭐ Calificación registrada para el punto seguro.`);
   };
 
   // Block & Report actions
@@ -504,6 +631,7 @@ export default function App() {
             onBack={() => setSubView({ type: 'match_detail', paramId: 'none' })}
             onSendMessage={(txt) => handleSendMessage(selectedId, txt)}
             onSimulateResponse={handleSimulateResponse}
+            userProfile={userProfile}
           />
         );
       }
@@ -526,10 +654,16 @@ export default function App() {
             collector={collector}
             userDuplicates={userDuplicates}
             userMissings={userMissings}
-            onSubmitProposal={handleAddTradeProposal}
+            onSubmitProposal={(prop) => {
+              handleAddTradeProposal(prop);
+              setPreselectedPointName(null); // clear preselected safe point after trade is submitted
+            }}
             onBack={() => setSubView({ type: 'match_detail', paramId: 'none' })}
             activeProposals={trades}
             onUpdateProposalStatus={handleUpdateProposalStatus}
+            userProfile={userProfile}
+            safePoints={safePoints}
+            initialSafePointName={preselectedPointName}
           />
         );
       }
@@ -539,8 +673,11 @@ export default function App() {
       return (
         <SecurityScreen
           onBack={() => setSubView({ type: 'match_detail', paramId: 'none' })}
-          isSupervised={userProfile?.isSupervised || false}
-          onToggleSupervision={handleToggleSupervision}
+          userProfile={userProfile!}
+          onUpdateUserProfile={(updated) => {
+            setUserProfile(updated);
+            persistState(STORAGE_KEYS.USER, updated);
+          }}
           blockedUsersCount={userProfile?.blockedUsers.length || 0}
           reportedUsersCount={userProfile?.reportedUsers.length || 0}
         />
@@ -554,9 +691,17 @@ export default function App() {
       case 'album':
         return (
           <MyAlbumScreen
+            activeAlbumId={userProfile?.activeAlbumId || 'mundial_2026'}
+            onSelectAlbum={(albumId) => {
+              if (userProfile) {
+                const updated = { ...userProfile, activeAlbumId: albumId };
+                setUserProfile(updated);
+                persistState(STORAGE_KEYS.USER, updated);
+              }
+            }}
             stickers={stickersList}
             albumName={
-              INITIAL_ALBUMS.find((a) => a.id === userProfile?.activeAlbumId)?.name || 'Mundial'
+              INITIAL_ALBUMS.find((a) => a.id === userProfile?.activeAlbumId)?.name || 'Panini Mundial 2026'
             }
             totalStickers={
               INITIAL_ALBUMS.find((a) => a.id === userProfile?.activeAlbumId)?.totalStickers || 250
@@ -569,8 +714,28 @@ export default function App() {
         return (
           <MatchesScreen
             matches={matchedResults}
+            userProfile={userProfile!}
+            safePoints={safePoints}
             onSelectMatch={(id) => setSubView({ type: 'match_detail', paramId: id })}
             onOpenChat={(id) => setSubView({ type: 'chat_room', paramId: id })}
+            onProposeTrade={(id) => setSubView({ type: 'trade_offer', paramId: id })}
+            onSelectSafePoint={(point) => {
+              setPreselectedPointName(point.name);
+              addNotification(`📍 Fijaste "${point.name}" como punto seguro para tu canje. Coordiná ahora un trueque!`);
+            }}
+          />
+        );
+      case 'puntos_seguros':
+        return (
+          <SafePointsScreen
+            safePoints={safePoints}
+            onSelectSafePoint={(point) => {
+              setPreselectedPointName(point.name);
+              addNotification(`📍 Elegiste "${point.name}". Podés usarlo para proponer un trueque seguro!`);
+            }}
+            onReportPoint={handleReportSafePoint}
+            onRatePoint={handleRateSafePointDirectly}
+            onBack={() => setActiveTab('inicio')}
           />
         );
       case 'chat':

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { NearbyCollector, TradeProposal, TradeStatus, SafePoint } from '../types';
+import { NearbyCollector, TradeProposal, TradeStatus, SafePoint, UserProfile } from '../types';
 import { SUGGESTED_SAFE_POINTS } from '../data';
-import { ArrowLeft, RefreshCw, Calendar, MapPin, ThumbsUp, Check, X, ShieldAlert, Award, Star } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Calendar, MapPin, ThumbsUp, Check, X, ShieldAlert, Award, Star, AlertTriangle } from 'lucide-react';
 
 interface ProposalScreenProps {
   collector: NearbyCollector;
@@ -10,7 +10,10 @@ interface ProposalScreenProps {
   onSubmitProposal: (proposal: TradeProposal) => void;
   onBack: () => void;
   activeProposals?: TradeProposal[];
-  onUpdateProposalStatus?: (id: string, newStatus: TradeStatus, rating?: number) => void;
+  onUpdateProposalStatus?: (id: string, newStatus: TradeStatus, rating?: number, safePointRating?: { stars: number; experienceText: string }) => void;
+  userProfile?: UserProfile;
+  safePoints?: SafePoint[];
+  initialSafePointName?: string | null;
 }
 
 export default function ProposalScreen({
@@ -20,7 +23,10 @@ export default function ProposalScreen({
   onSubmitProposal,
   onBack,
   activeProposals = [],
-  onUpdateProposalStatus
+  onUpdateProposalStatus,
+  userProfile,
+  safePoints = SUGGESTED_SAFE_POINTS,
+  initialSafePointName
 }: ProposalScreenProps) {
   const [viewMode, setViewMode] = useState<'create' | 'list'>('create');
   
@@ -35,9 +41,18 @@ export default function ProposalScreen({
       .filter((code) => collector.stickers[code] === 'repetida' && userMissings.includes(code))
   );
 
-  const [selectedSafePoint, setSelectedSafePoint] = useState<string>(SUGGESTED_SAFE_POINTS[0].name);
+  const [selectedSafePoint, setSelectedSafePoint] = useState<string>(initialSafePointName || safePoints[0]?.name || 'Kiosco El Álbum');
+  const [isCustomPoint, setIsCustomPoint] = useState(false);
+  const [customPointName, setCustomPointName] = useState('');
   const [meetingTime, setMeetingTime] = useState('Hoy a las 18:00 hs');
   const [activeRating, setActiveRating] = useState<{ proposalId: string; stars: number } | null>(null);
+  const [activeSafePointRating, setActiveSafePointRating] = useState<{
+    proposalId: string;
+    safePointName: string;
+    stars: number;
+    experience: string;
+  } | null>(null);
+  const [tempCollectorRating, setTempCollectorRating] = useState<number>(5);
 
   // Toggle selection
   const handleToggleOffered = (code: string) => {
@@ -57,6 +72,7 @@ export default function ProposalScreen({
   };
 
   const handleSubmit = () => {
+    const finalPoint = isCustomPoint ? customPointName : selectedSafePoint;
     const newProposal: TradeProposal = {
       id: 'trade_' + Date.now(),
       senderId: 'sofi_user',
@@ -67,7 +83,7 @@ export default function ProposalScreen({
       requestedStickers: requested,
       status: 'propuesto',
       date: new Date().toLocaleDateString('es-AR'),
-      safePointName: selectedSafePoint,
+      safePointName: finalPoint || 'Punto personalizado',
       meetingTime
     };
 
@@ -196,19 +212,56 @@ export default function ProposalScreen({
             </h4>
 
             {/* Safe Point Select */}
-            <div className="space-y-1.5">
-              <label className="block text-[10px] font-bold text-gray-400 uppercase">Punto Sugerido Oficial</label>
+            <div className="space-y-2">
+              <label className="block text-[10px] font-bold text-gray-400 uppercase">Punto de Encuentro sugerido</label>
               <select
-                value={selectedSafePoint}
-                onChange={(e) => setSelectedSafePoint(e.target.value)}
+                id="safe-point-dropdown-select"
+                value={isCustomPoint ? 'custom' : selectedSafePoint}
+                onChange={(e) => {
+                  if (e.target.value === 'custom') {
+                    setIsCustomPoint(true);
+                  } else {
+                    setIsCustomPoint(false);
+                    setSelectedSafePoint(e.target.value);
+                  }
+                }}
                 className="w-full bg-gray-50 border border-gray-150 rounded-xl py-2 px-3 text-xs font-bold text-gray-700 cursor-pointer"
               >
-                {SUGGESTED_SAFE_POINTS.map((sp) => (
+                {safePoints.map((sp) => (
                   <option key={sp.id} value={sp.name}>
-                    {sp.name} - {sp.address}
+                    🏪 {sp.name} ({sp.neighborhood}) · ⭐{sp.rating}
                   </option>
                 ))}
+                <option value="custom">✍️ Otro lugar (Escribir dirección/nombre)...</option>
               </select>
+
+              {/* Custom Input Field */}
+              {isCustomPoint && (
+                <div className="space-y-1.5 animate-fadeIn">
+                  <span className="text-[9px] font-bold text-indigo-600 uppercase">Especificar Punto Personalizado</span>
+                  <input
+                    id="custom-safe-point-text-input"
+                    type="text"
+                    value={customPointName}
+                    onChange={(e) => setCustomPointName(e.target.value)}
+                    placeholder="Ej: McDonald's Av Santa Fe y Av Coronel Diaz"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+              )}
+
+              {/* Warning if custom point and minorMode is active (Rules 5 & 6) */}
+              {isCustomPoint && userProfile?.minorModeActive && (
+                <div id="minor-custom-location-warning-card" className="bg-amber-50 border border-amber-200 p-3.5 rounded-2xl flex items-start gap-2.5 text-left animate-fadeIn">
+                  <AlertTriangle className="text-amber-600 flex-shrink-0 mt-0.5" size={16} />
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black uppercase text-amber-800">Advertencia para Menores</span>
+                    <p className="text-[10px] font-extrabold leading-relaxed text-amber-900">
+                      Este perfil tiene activado el Modo Menor Acompañado. Se recomienda concretar el intercambio en un punto seguro.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Meet Hour */}
@@ -370,8 +423,22 @@ export default function ProposalScreen({
                           <button
                             key={starIdx}
                             onClick={() => {
-                              onUpdateProposalStatus!(p.id, 'realizado', starIdx);
+                              setTempCollectorRating(starIdx);
                               setActiveRating(null);
+                              
+                              // Check if there is a known safe point that is registered in our database
+                              const pointExists = safePoints.some(sp => sp.name === p.safePointName);
+                              if (p.safePointName && p.safePointName !== 'No fijado' && pointExists) {
+                                setActiveSafePointRating({
+                                  proposalId: p.id,
+                                  safePointName: p.safePointName,
+                                  stars: 5,
+                                  experience: 'Muy buena'
+                                });
+                              } else {
+                                // Direct submit if custom or no safe point
+                                onUpdateProposalStatus!(p.id, 'realizado', starIdx);
+                              }
                             }}
                             className="p-1 cursor-pointer bg-slate-50 hover:bg-indigo-50 border border-gray-100 rounded-lg hover:scale-110 active:scale-95 transition"
                           >
@@ -385,6 +452,72 @@ export default function ProposalScreen({
                         ))}
                       </div>
                       <p className="text-[10px] text-gray-400">Toca las estrellas para registrar tu puntaje seguro</p>
+                    </div>
+                  )}
+
+                  {/* Safe Point Experience Rating Block */}
+                  {activeSafePointRating?.proposalId === p.id && (
+                    <div className="pt-3 border-t border-dashed border-gray-100 space-y-3 p-4 bg-indigo-50/60 rounded-2xl border border-indigo-100 text-left animate-fadeIn">
+                      <p className="text-xs font-black text-indigo-900 flex items-center gap-1.5">
+                        🏪 ¿Cómo fue tu experiencia en el punto "{activeSafePointRating.safePointName}"?
+                      </p>
+                      
+                      {/* Star selection for Safe Point */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] text-indigo-800 font-bold">Calificación de seguridad:</span>
+                        <div className="flex gap-1.5 flex-shrink-0">
+                          {[1, 2, 3, 4, 5].map((starIdx) => (
+                            <button
+                              key={starIdx}
+                              onClick={() => setActiveSafePointRating({
+                                ...activeSafePointRating,
+                                stars: starIdx
+                              })}
+                              className="text-lg bg-white border border-gray-150 rounded px-1 flex-shrink-0 cursor-pointer"
+                            >
+                              <span className={starIdx <= activeSafePointRating.stars ? 'text-amber-400' : 'text-gray-300'}>★</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Experience selection pills */}
+                      <div className="space-y-1">
+                        <span className="text-[11px] text-indigo-850 font-bold block">Contanos tu experiencia general:</span>
+                        <div className="flex gap-1 flex-wrap">
+                          {['Muy buena', 'Buena', 'Regular', 'Mala'].map(opt => (
+                            <button
+                              key={opt}
+                              onClick={() => setActiveSafePointRating({
+                                ...activeSafePointRating,
+                                experience: opt
+                              })}
+                              className={`px-2.5 py-1 rounded-xl text-[10.5px] border font-black cursor-pointer transition ${
+                                activeSafePointRating.experience === opt 
+                                  ? 'bg-indigo-600 text-white border-indigo-600' 
+                                  : 'bg-white text-slate-650 border-slate-200'
+                              }`}
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          onUpdateProposalStatus!(
+                            p.id, 
+                            'realizado', 
+                            tempCollectorRating, 
+                            { stars: activeSafePointRating.stars, experienceText: activeSafePointRating.experience }
+                          );
+                          setActiveSafePointRating(null);
+                        }}
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-[11px] py-2 rounded-xl uppercase tracking-wider block text-center cursor-pointer"
+                      >
+                        Enviar Evaluación del Lugar & Guardar
+                      </button>
                     </div>
                   )}
 

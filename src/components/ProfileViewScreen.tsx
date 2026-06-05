@@ -67,9 +67,9 @@ export default function ProfileViewScreen({
           <p className="text-[11px] text-gray-400 font-medium">Barrio: {userProfile.neighborhood}</p>
 
           {/* Supervisor tag */}
-          {userProfile.isSupervised && (
-            <div className="bg-yellow-50 text-yellow-700 text-[10px] py-1 px-3 rounded-full font-bold border border-yellow-200 mt-2 flex items-center gap-1">
-              🛡️ Cuenta Supervisada por un pariente
+          {userProfile.minorModeActive && (
+            <div className="bg-emerald-50 text-emerald-800 text-[10.5px] py-1 px-3.5 rounded-full font-black border border-emerald-200 mt-2 flex items-center gap-1 uppercase tracking-wider shadow-3xs hover:bg-emerald-100 transition">
+              🛡️ Cuenta Supervisada
             </div>
           )}
 
@@ -89,6 +89,59 @@ export default function ProfileViewScreen({
           </div>
         </div>
       </div>
+
+      {/* Modo Menor Acompañado Supervisor Card */}
+      {userProfile.minorModeActive && (
+        <div className="bg-white border-2 border-indigo-100 rounded-3xl p-5 shadow-3xs space-y-3.5 relative overflow-hidden animate-fadeIn">
+          <div className="absolute top-0 right-0 p-2 text-indigo-500 opacity-20">
+            <ShieldAlert size={48} />
+          </div>
+          
+          <div className="flex items-center gap-1.5 border-b border-slate-100 pb-2.5">
+            <span className="text-base">🛡️</span>
+            <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest leading-none">
+              Modo Menor Acompañado: Activo
+            </h4>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 text-left">
+            <div>
+              <span className="block text-[9px] font-black uppercase text-slate-400 tracking-wider">Menor a cargo</span>
+              <p className="text-xs font-bold text-slate-800 mt-0.5">{userProfile.name}</p>
+            </div>
+            <div>
+              <span className="block text-[9px] font-black uppercase text-slate-400 tracking-wider">Zona aproximada</span>
+              <p className="text-xs font-bold text-slate-800 mt-0.5">{userProfile.neighborhood}</p>
+            </div>
+            <div>
+              <span className="block text-[9px] font-black uppercase text-slate-400 tracking-wider">Adulto Responsable</span>
+              <p className="text-xs font-bold text-slate-800 mt-0.5">{userProfile.adultName || 'Mariana'}</p>
+            </div>
+            <div>
+              <span className="block text-[9px] font-black uppercase text-slate-400 tracking-wider">Parentesco / Relación</span>
+              <p className="text-xs font-bold text-slate-800 mt-0.5">{userProfile.adultRelation || 'Madre'}</p>
+            </div>
+          </div>
+
+          <div className="bg-emerald-50/50 p-2.5 rounded-2xl border border-emerald-100/50 text-left text-[11px] text-emerald-950 font-bold flex flex-col gap-1">
+            <p className="flex items-center gap-1.5 text-emerald-800 text-[10px] uppercase tracking-wider font-extrabold">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Preferencia de Seguridad
+            </p>
+            <p className="font-semibold text-emerald-700">
+              {userProfile.onlySafePointsActive ? 'Solo se permiten intercambios en puntos recomendados y seguros.' : 'Acompañamiento y encuentros seguros sugeridos.'}
+            </p>
+          </div>
+
+          {/* Privacy and Hidden sensitive data block */}
+          <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-100 text-left text-[10px] leading-relaxed text-slate-500 font-semibold space-y-1">
+            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">🔒 Privacidad activa del menor:</span>
+            <p className="flex items-center gap-1">🔴 Dirección exacta: <span className="bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-mono text-[9px]">OCULTA por seguridad</span></p>
+            <p className="flex items-center gap-1">🔴 Teléfono: <span className="bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-mono text-[9px]">OCULTO por seguridad</span></p>
+            <p className="flex items-center gap-1">🔴 Correo electrónico: <span className="bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-mono text-[8px] truncate">{userProfile.email.replace(/(.{2}).+(@.+)/, "$1***$2")} (REGISTRADO)</span></p>
+            <p className="flex items-center gap-1">🔴 Ubicación en vivo (GPS): <span className="bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-mono text-[9px]">DESACTIVADA</span></p>
+          </div>
+        </div>
+      )}
 
       {/* Badges list */}
       <div className="bg-white border border-gray-100 rounded-3xl p-5 shadow-2xs space-y-3">
