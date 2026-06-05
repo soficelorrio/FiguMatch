@@ -1,49 +1,85 @@
-import { Album, NearbyCollector, SafePoint, UserProfile, MatchResult, ChatMessage, TradeProposal, StickerStatus } from './types';
+import { Album, NearbyCollector, SafePoint, UserProfile, MatchResult, ChatMessage, TradeProposal, StickerStatus, StickerState } from './types';
 
 export const INITIAL_ALBUMS: Album[] = [
   {
     id: 'mundial_2026',
-    name: 'Mundial de Fútbol 2026',
-    totalStickers: 250,
+    name: 'Panini Mundial 2026',
+    totalStickers: 980,
     category: 'Futbol',
     imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=200'
-  },
-  {
-    id: 'copa_america_25',
-    name: 'Copa América 2024/2025',
-    totalStickers: 180,
-    category: 'Futbol',
-    imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=200'
-  },
-  {
-    id: 'liga_arg_26',
-    name: 'Liga Profesional de Fútbol',
-    totalStickers: 300,
-    category: 'Futbol',
-    imageUrl: 'https://images.unsplash.com/photo-1518063319789-7217e6706b04?auto=format&fit=crop&q=80&w=200'
-  },
-  {
-    id: 'disney_magia',
-    name: 'Disney 100: Álbum Mágico',
-    totalStickers: 150,
-    category: 'Animacion',
-    imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=200'
-  },
-  {
-    id: 'pokemon_tcg',
-    name: 'Pokémon: Gotta Catch \'Em All',
-    totalStickers: 151,
-    category: 'Anime',
-    imageUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&q=80&w=200'
-  },
-  {
-    id: 'marvel_heroes',
-    name: 'Marvel Heroes & Villains',
-    totalStickers: 200,
-    category: 'Mundo Geek',
-    imageUrl: 'https://images.unsplash.com/photo-1635805737707-575885ab0820?auto=format&fit=crop&q=80&w=200'
   }
 ];
+
+export const SELECTIONS = [
+  { code: 'MEX', name: 'México' },
+  { code: 'RSA', name: 'Sudáfrica' },
+  { code: 'KOR', name: 'Corea del Sur' },
+  { code: 'CZE', name: 'República Checa' },
+  { code: 'CAN', name: 'Canadá' },
+  { code: 'BIH', name: 'Bosnia y Herzegovina' },
+  { code: 'QAT', name: 'Qatar' },
+  { code: 'SUI', name: 'Suiza' },
+  { code: 'BRA', name: 'Brasil' },
+  { code: 'MAR', name: 'Marruecos' },
+  { code: 'HAI', name: 'Haití' },
+  { code: 'SCO', name: 'Escocia' },
+  { code: 'USA', name: 'Estados Unidos' },
+  { code: 'PAR', name: 'Paraguay' },
+  { code: 'AUS', name: 'Australia' },
+  { code: 'TUR', name: 'Turquía' },
+  { code: 'GER', name: 'Alemania' },
+  { code: 'CUW', name: 'Curazao' },
+  { code: 'CIV', name: 'Costa de Marfil' },
+  { code: 'ECU', name: 'Ecuador' },
+  { code: 'NED', name: 'Países Bajos' },
+  { code: 'JPN', name: 'Japón' },
+  { code: 'SWE', name: 'Suecia' },
+  { code: 'TUN', name: 'Túnez' },
+  { code: 'BEL', name: 'Bélgica' },
+  { code: 'EGY', name: 'Egipto' },
+  { code: 'IRN', name: 'Irán' },
+  { code: 'NZL', name: 'Nueva Zelanda' },
+  { code: 'ESP', name: 'España' },
+  { code: 'CPV', name: 'Cabo Verde' },
+  { code: 'KSA', name: 'Arabia Saudita' },
+  { code: 'URU', name: 'Uruguay' },
+  { code: 'FRA', name: 'Francia' },
+  { code: 'SEN', name: 'Senegal' },
+  { code: 'IRQ', name: 'Irak' },
+  { code: 'NOR', name: 'Noruega' },
+  { code: 'ARG', name: 'Argentina' },
+  { code: 'ALG', name: 'Argelia' },
+  { code: 'AUT', name: 'Austria' },
+  { code: 'JOR', name: 'Jordania' },
+  { code: 'POR', name: 'Portugal' },
+  { code: 'COD', name: 'República Democrática del Congo' },
+  { code: 'UZB', name: 'Uzbekistán' },
+  { code: 'COL', name: 'Colombia' },
+  { code: 'ENG', name: 'Inglaterra' },
+  { code: 'CRO', name: 'Croacia' },
+  { code: 'GHA', name: 'Ghana' },
+  { code: 'PAN', name: 'Panamá' }
+];
+
+// Helper structures to list all official codes of the album in real order
+export const FWC_INITIAL_CODES = ['00', 'FWC1', 'FWC2', 'FWC3', 'FWC4', 'FWC5', 'FWC6', 'FWC7', 'FWC8'];
+export const FWC_FINAL_CODES = ['FWC9', 'FWC10', 'FWC11', 'FWC12', 'FWC13', 'FWC14', 'FWC15', 'FWC16', 'FWC17', 'FWC18', 'FWC19'];
+export const CC_PROMO_CODES = ['CC1', 'CC2', 'CC3', 'CC4', 'CC5', 'CC6', 'CC7', 'CC8', 'CC9', 'CC10', 'CC11', 'CC12', 'CC13', 'CC14'];
+
+export function getAllMainAlbumCodes(): string[] {
+  const codes: string[] = [...FWC_INITIAL_CODES];
+  for (const s of SELECTIONS) {
+    for (let j = 1; j <= 20; j++) {
+      codes.push(`${s.code}${j}`);
+    }
+  }
+  codes.push(...FWC_FINAL_CODES);
+  return codes;
+}
+
+export function getAllStickerCodes(): string[] {
+  return [...getAllMainAlbumCodes(), ...CC_PROMO_CODES];
+}
 
 export const INITIAL_USER: UserProfile = {
   id: 'sofi_user',
@@ -61,32 +97,94 @@ export const INITIAL_USER: UserProfile = {
   reportedUsers: []
 };
 
-// Initial sticker states for Sofi in her active album 'mundial_2026'
-// Faltantes: 12, 45, 78, 120, 134
-// Repetidas: 4, 9, 34, 87, 92
-// Tengo (owned but not duplicate): e.g. 5, 23, 100, 150
-export const INITIAL_STICKER_LIST = [
-  { number: 12, status: 'faltante' as const },
-  { number: 45, status: 'faltante' as const },
-  { number: 78, status: 'faltante' as const },
-  { number: 120, status: 'faltante' as const },
-  { number: 134, status: 'faltante' as const },
-  { number: 4, status: 'repetida' as const },
-  { number: 9, status: 'repetida' as const },
-  { number: 34, status: 'repetida' as const },
-  { number: 87, status: 'repetida' as const },
-  { number: 92, status: 'repetida' as const },
-  // Some others that are just "tengo"
-  { number: 5, status: 'tengo' as const },
-  { number: 10, status: 'tengo' as const },
-  { number: 15, status: 'tengo' as const },
-  { number: 23, status: 'tengo' as const },
-  { number: 50, status: 'tengo' as const },
-  { number: 100, status: 'tengo' as const },
-  { number: 110, status: 'tengo' as const },
-  { number: 150, status: 'tengo' as const },
-  { number: 200, status: 'tengo' as const },
-];
+// GENERATE SOFI'S INITIAL STICKERS WITH PRECISE STATS:
+// 1. Faltantes: ARG17, ARG20, BRA10, MEX4, FWC11, CC3
+// 2. Repetidas: ARG4, MEX12, BRA7, USA5, FWC2
+// 3. Album principal: Tenés exactly 245 of 980
+// 4. Argentina: Tenés exactly 14 of 20
+// 5. Coca-Cola Promo: Tenés exactly 3 of 14 (separate progess)
+const buildInitialStickerList = (): StickerState[] => {
+  const list: StickerState[] = [];
+  const mainCodes = getAllMainAlbumCodes();
+
+  // Explicit status definitions
+  const explicitFaltantes = ['ARG17', 'ARG20', 'BRA10', 'MEX4', 'FWC11', 'CC3'];
+  const explicitRepetidas = ['ARG4', 'MEX12', 'BRA7', 'USA5', 'FWC2'];
+
+  const initialTengoMap = new Set<string>();
+
+  // We need 14 of 20 for Argentina.
+  // ARG17 & ARG20 are faltante. ARG4 is repetida (owned). We need 13 other ARG stickers to be "tengo"
+  const argTengos = ['ARG1', 'ARG2', 'ARG3', 'ARG5', 'ARG6', 'ARG7', 'ARG8', 'ARG9', 'ARG10', 'ARG11', 'ARG12', 'ARG13', 'ARG14'];
+  argTengos.forEach(c => initialTengoMap.add(c));
+
+  // Coca-Cola needs 3 of 14.
+  // CC3 is faltante. We need 3 other CC stickers to be "tengo"
+  const ccTengos = ['CC1', 'CC2', 'CC4'];
+  ccTengos.forEach(c => initialTengoMap.add(c));
+
+  // Main Album requires 245 owned total.
+  // We already have:
+  // - 13 ARG tengos + 1 ARG repetida = 14 owned
+  // - 1 MEX12 repetida = 1 owned
+  // - 1 BRA7 repetida = 1 owned
+  // - 1 USA5 repetida = 1 owned
+  // - 1 FWC2 repetida = 1 owned
+  // Total pre-assigned owned in main album = 18 owned.
+  // Left to distribute owned in main album = 245 - 18 = 227 "tengo" stickers
+  
+  // Let's add some typical tengos in other teams to meet the 227 owned requirement
+  // Let's make RSA1 to RSA20 owned (20)
+  // KOR1 to KOR20 owned (20)
+  // CZE1 to CZE20 owned (20)
+  // CAN1 to CAN20 owned (20)
+  // BIH1 to BIH20 owned (20)
+  // QAT1 to QAT20 owned (20)
+  // SUI1 to SUI20 owned (20)
+  // MAR1 to MAR20 owned (20)
+  // HAI1 to HAI20 owned (20)
+  // SCO1 to SCO20 owned (20)
+  // USA1 to USA4 owned (4) -> already USA5 is repetida
+  // GER1 to GER20 owned (20)
+  // That's 11 selections * 20 = 220 + 4 = 224 owned.
+  // We need 3 more owned: let's make MEX1, MEX2, MEX3 owned (3).
+  // Total is exactly 227 owned distributed!
+  const bulkTengos = [
+    ...Array.from({ length: 20 }, (_, i) => `RSA${i + 1}`),
+    ...Array.from({ length: 20 }, (_, i) => `KOR${i + 1}`),
+    ...Array.from({ length: 20 }, (_, i) => `CZE${i + 1}`),
+    ...Array.from({ length: 20 }, (_, i) => `CAN${i + 1}`),
+    ...Array.from({ length: 20 }, (_, i) => `BIH${i + 1}`),
+    ...Array.from({ length: 20 }, (_, i) => `QAT${i + 1}`),
+    ...Array.from({ length: 20 }, (_, i) => `SUI${i + 1}`),
+    ...Array.from({ length: 20 }, (_, i) => `MAR${i + 1}`),
+    ...Array.from({ length: 20 }, (_, i) => `HAI${i + 1}`),
+    ...Array.from({ length: 20 }, (_, i) => `SCO${i + 1}`),
+    ...Array.from({ length: 4 }, (_, i) => `USA${i + 1}`),
+    ...Array.from({ length: 20 }, (_, i) => `GER${i + 1}`),
+    'MEX1', 'MEX2', 'MEX3'
+  ];
+  bulkTengos.forEach(c => initialTengoMap.add(c));
+
+  // Loop through all codes to populate initial values
+  const allCodes = getAllStickerCodes();
+  for (const code of allCodes) {
+    if (explicitFaltantes.includes(code)) {
+      list.push({ code, status: 'faltante' });
+    } else if (explicitRepetidas.includes(code)) {
+      list.push({ code, status: 'repetida' });
+    } else if (initialTengoMap.has(code)) {
+      list.push({ code, status: 'tengo' });
+    } else {
+      // Everything else defaults to "faltante" to replicate standard collecting state
+      list.push({ code, status: 'faltante' });
+    }
+  }
+
+  return list;
+};
+
+export const INITIAL_STICKER_LIST: StickerState[] = buildInitialStickerList();
 
 export const INITIAL_COLLECTORS: NearbyCollector[] = [
   {
@@ -103,18 +201,13 @@ export const INITIAL_COLLECTORS: NearbyCollector[] = [
     activeAlbumId: 'mundial_2026',
     activityTime: 'Hace 5 min',
     stickers: {
-      // Tiene (repetidas): 45, 120, 200
-      45: 'repetida',
-      120: 'repetida',
-      200: 'repetida',
-      // Necesita (faltantes): 87, 92
-      87: 'faltante',
-      92: 'faltante',
-      // Others
-      4: 'tengo',
-      9: 'tengo',
-      12: 'tengo',
-      78: 'tengo',
+      // Tiene repetidas: ARG17, BRA10, FWC11
+      'ARG17': 'repetida',
+      'BRA10': 'repetida',
+      'FWC11': 'repetida',
+      // Le faltan: ARG4, MEX12
+      'ARG4': 'faltante',
+      'MEX12': 'faltante'
     }
   },
   {
@@ -131,16 +224,12 @@ export const INITIAL_COLLECTORS: NearbyCollector[] = [
     activeAlbumId: 'mundial_2026',
     activityTime: 'Hace 15 min',
     stickers: {
-      // Tiene (repetidas): 78, 134
-      78: 'repetida',
-      134: 'repetida',
-      // Necesita (faltantes): 4
-      4: 'faltante',
-      // Others
-      12: 'tengo',
-      45: 'tengo',
-      87: 'tengo',
-      120: 'tengo',
+      // Tiene repetidas: MEX4, ARG20
+      'MEX4': 'repetida',
+      'ARG20': 'repetida',
+      // Le faltan: BRA7, USA5
+      'BRA7': 'faltante',
+      'USA5': 'faltante'
     }
   },
   {
@@ -157,37 +246,10 @@ export const INITIAL_COLLECTORS: NearbyCollector[] = [
     activeAlbumId: 'mundial_2026',
     activityTime: 'Hace 1 hora',
     stickers: {
-      // Tiene (repetidas): 12
-      12: 'repetida',
-      // Necesita (faltantes): 150
-      150: 'faltante',
-      // Others
-      45: 'tengo',
-      78: 'tengo',
-      120: 'tengo',
-    }
-  },
-  {
-    id: 'lucas_collector',
-    name: 'Lucas',
-    avatar: '👨',
-    neighborhood: 'Palermo',
-    distance: 0.5,
-    avgRating: 4.7,
-    exchangesCount: 22,
-    userType: 'coleccionista',
-    badges: ['Usuario verificado', 'Buen intercambiador'],
-    isVerified: true,
-    activeAlbumId: 'mundial_2026',
-    activityTime: 'Hace 2 horas',
-    stickers: {
-      // Tiene (repetidas): none that Sofi needs, but has 45, 120 (which Sofi needs but Lucas has them as 'tengo', not duplicate)
-      45: 'tengo',
-      120: 'tengo',
-      // Needs (faltantes): 9 (which Sofi has)
-      9: 'faltante',
-      // He has repetida 15 (which Sofi has as tengo)
-      15: 'repetida'
+      // Tiene repetidas: CC3
+      'CC3': 'repetida',
+      // Le faltan: PAN8
+      'PAN8': 'faltante'
     }
   },
   {
@@ -204,31 +266,13 @@ export const INITIAL_COLLECTORS: NearbyCollector[] = [
     activeAlbumId: 'mundial_2026',
     activityTime: 'Abierto ahora',
     stickers: {
-      // Kiosco has many stickers or helps matchmaking! Let's say he has repetida 12, 45, 78, 120, 134! That's why he is a punto seguro
-      12: 'repetida',
-      45: 'repetida',
-      78: 'repetida',
-      120: 'repetida',
-      134: 'repetida',
-    }
-  },
-  {
-    id: 'club_estudiantes',
-    name: 'Club Atlético Palermo',
-    avatar: '🏟️',
-    neighborhood: 'Palermo',
-    distance: 1.5,
-    avgRating: 5.0,
-    exchangesCount: 504,
-    userType: 'club',
-    badges: ['Punto Seguro Ofic.', 'Verificado'],
-    isVerified: true,
-    activeAlbumId: 'mundial_2026',
-    activityTime: 'Activo fines de semana',
-    stickers: {
-      12: 'repetida',
-      78: 'repetida',
-      134: 'repetida',
+      // Has some repetidas to behave as a trading base
+      'MEX4': 'repetida',
+      'ARG20': 'repetida',
+      'ARG17': 'repetida',
+      'BRA10': 'repetida',
+      'FWC11': 'repetida',
+      'CC3': 'repetida'
     }
   }
 ];
@@ -273,19 +317,18 @@ export const SUGGESTED_SAFE_POINTS: SafePoint[] = [
 ];
 
 export const INITIAL_CHATS: ChatMessage[] = [
-  // Initial conversations
   {
     id: 'msg_1',
     senderId: 'martina_collector',
     receiverId: 'sofi_user',
-    text: '¡Hola Sofi! Vi que tenés la 87 y 92 repetidas, a mí me faltan justo esas. Yo tengo la 45 y 120 para vos. ¿Hacemos el trueque?',
+    text: '¡Hola Sofi! Vi que tenés la ARG4 y MEX12 repetidas, a mí me faltan justo esas. Yo tengo la ARG17 y BRA10 para vos. ¿Hacemos el trueque?',
     timestamp: '2026-06-05T14:30:00Z'
   },
   {
     id: 'msg_2',
     senderId: 'sofi_user',
     receiverId: 'martina_collector',
-    text: 'Hola Martina! Sii me re sirve, te guardo las mías.',
+    text: '¡Hola Martina! Sii me re sirve, te guardo las mías.',
     timestamp: '2026-06-05T14:35:00Z'
   },
   {
@@ -304,8 +347,8 @@ export const INITIAL_TRADES: TradeProposal[] = [
     receiverId: 'sofi_user',
     receiverName: 'Martina',
     receiverAvatar: '👩',
-    offeredStickers: [45, 120],
-    requestedStickers: [87, 92],
+    offeredStickers: ['ARG17', 'BRA10'],
+    requestedStickers: ['ARG4', 'MEX12'],
     status: 'en_coordinacion',
     date: '2026-06-05',
     safePointName: 'Kiosco El Álbum',
@@ -314,71 +357,50 @@ export const INITIAL_TRADES: TradeProposal[] = [
   {
     id: 'trade_2',
     senderId: 'sofi_user',
-    receiverId: 'tomas_collector',
-    receiverName: 'Tomás',
-    receiverAvatar: '🧑',
-    offeredStickers: [],
-    requestedStickers: [12],
+    receiverId: 'juan_collector',
+    receiverName: 'Juan',
+    receiverAvatar: '👦',
+    offeredStickers: ['BRA7', 'USA5'],
+    requestedStickers: ['MEX4', 'ARG20'],
     status: 'propuesto',
     date: '2026-06-05'
-  },
-  {
-    id: 'trade_history_1',
-    senderId: 'sofi_user',
-    receiverId: 'lucas_collector',
-    receiverName: 'Lucas',
-    receiverAvatar: '👨',
-    offeredStickers: [34],
-    requestedStickers: [5],
-    status: 'realizado',
-    date: '2026-06-01',
-    safePointName: 'Plaza Unidad Latinoamericana',
-    ratingGivenForThem: 5,
-    feedbackText: '¡Súper confiable e imprimió las figuritas impecables!'
   }
 ];
 
-// Matching algorithm function
 export function calculateMatches(
   userAlbumId: string,
-  userStickers: { number: number; status: StickerStatus }[],
+  userStickers: { code: string; status: StickerStatus }[],
   collectors: NearbyCollector[],
   blockedUserIds: string[]
 ): MatchResult[] {
-  // Extract user's actual missing and duplicates
-  // Ensure we fall back to defaults if not found
   const userFaltantes = userStickers
     .filter((s) => s.status === 'faltante')
-    .map((s) => s.number);
+    .map((s) => s.code);
   const userRepetidas = userStickers
     .filter((s) => s.status === 'repetida')
-    .map((s) => s.number);
+    .map((s) => s.code);
 
   const activeCollectors = collectors.filter(
     (c) => c.activeAlbumId === userAlbumId && !blockedUserIds.includes(c.id)
   );
 
   const results: MatchResult[] = activeCollectors.map((collector) => {
-    // collector's duplicates (repetidas)
     const collectorRepetidas = Object.entries(collector.stickers)
       .filter(([_, status]) => status === 'repetida')
-      .map(([num]) => parseInt(num));
+      .map(([code]) => code);
 
-    // collector's missing (faltantes)
     const collectorFaltantes = Object.entries(collector.stickers)
       .filter(([_, status]) => status === 'faltante')
-      .map(([num]) => parseInt(num));
+      .map(([code]) => code);
 
-    // What C has that User needs
-    // Intersection of user's missing and collector's duplicates
-    const theyOfferToUser = collectorRepetidas.filter((num) =>
-      userFaltantes.includes(num)
+    // What they have that you need
+    const theyOfferToUser = collectorRepetidas.filter((code) =>
+      userFaltantes.includes(code)
     );
 
-    // What User has that C needs
-    // Intersection of collector's missing and user's duplicates
-    const userOffersToThem = userRepetidas.filter((num) =>
-      collectorFaltantes.includes(num)
+    // What you have that they need
+    const userOffersToThem = userRepetidas.filter((code) =>
+      collectorFaltantes.includes(code)
     );
 
     let matchLevel: 'alta' | 'media' | 'baja' = 'baja';
@@ -388,12 +410,6 @@ export function calculateMatches(
       matchLevel = 'media';
     }
 
-    // Scoring to tie-break / sort matches:
-    // 1. match Level (alta = 300, media = 100, baja = 0)
-    // 2. total matches count (theyOfferToUser + userOffersToThem) * 10
-    // 3. Distance multiplier (fewer km -> higher score, e.g. (10 - distance) * 5)
-    // 4. Rating modifier (avgRating * 2)
-    // 5. Verification status (verified = +20)
     const lvlScore = matchLevel === 'alta' ? 300 : matchLevel === 'media' ? 100 : 0;
     const countScore = (theyOfferToUser.length + userOffersToThem.length) * 15;
     const distScore = Math.max(0, 10 - collector.distance) * 8;
@@ -411,7 +427,5 @@ export function calculateMatches(
     };
   });
 
-  // Sort by matches calculation:
-  // 1. Highest match score (which encodes matches count, distance, rating, verified state)
   return results.sort((a, b) => b.matchScore - a.matchScore);
 }

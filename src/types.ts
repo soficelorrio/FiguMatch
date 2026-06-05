@@ -29,7 +29,7 @@ export interface Album {
 export type StickerStatus = 'faltante' | 'tengo' | 'repetida' | 'reservada' | 'intercambiada';
 
 export interface StickerState {
-  number: number;
+  code: string;
   status: StickerStatus;
 }
 
@@ -45,15 +45,15 @@ export interface NearbyCollector {
   badges: string[];
   isVerified: boolean;
   activeAlbumId: string;
-  stickers: { [num: number]: StickerStatus }; // Sticker state mapping
+  stickers: { [code: string]: StickerStatus }; // Sticker state mapping
   activityTime: string; // e.g. "Hace 5 min", "Hace 2 horas"
 }
 
 export interface MatchResult {
   collector: NearbyCollector;
   matchLevel: 'alta' | 'media' | 'baja';
-  userOffersToThem: number[]; // stickers you have as 'repetida' that they have as 'faltante'
-  theyOfferToUser: number[]; // stickers they have as 'repetida' that you have as 'faltante'
+  userOffersToThem: string[]; // stickers you have as 'repetida' that they have as 'faltante'
+  theyOfferToUser: string[]; // stickers they have as 'repetida' that you have as 'faltante'
   matchScore: number; // helper score to rank
 }
 
@@ -80,8 +80,8 @@ export interface TradeProposal {
   receiverId: string;
   receiverName: string;
   receiverAvatar: string;
-  offeredStickers: number[];
-  requestedStickers: number[];
+  offeredStickers: string[];
+  requestedStickers: string[];
   status: TradeStatus;
   date: string; // ISO String or date label
   safePointName?: string;

@@ -217,49 +217,24 @@ export default function MatchesScreen({
                   </p>
                 </div>
               ) : matchCoincides ? (
-                <div className="bg-slate-50/80 p-3 rounded-2xl border border-gray-100 space-y-2 text-[11px]">
+                <div className="bg-indigo-50/45 p-3 rounded-2xl border border-indigo-100/50 space-y-2 text-xs">
                   
-                  {/* She has what you need */}
-                  {m.theyOfferToUser.length > 0 && (
-                    <div className="flex items-start gap-1.5">
-                      <span className="text-green-600 font-bold flex-shrink-0">Tiene:</span>
-                      <div className="flex flex-wrap gap-1">
-                        {m.theyOfferToUser.map((stickerNum) => (
-                          <span
-                            key={stickerNum}
-                            className="bg-green-100 text-green-800 font-mono text-[9px] font-black px-1.5 py-0.5 rounded-md"
-                          >
-                            #{stickerNum}
-                          </span>
-                        ))}
-                        <span className="text-[10px] text-gray-400 self-center">
-                          que te faltan
-                        </span>
-                      </div>
+                  {/* Highly polished exact match descriptions required by the prompt */}
+                  {m.matchLevel === 'alta' && (
+                    <div className="bg-indigo-600/10 p-2.5 rounded-xl border border-indigo-200/55 text-indigo-900 font-bold mb-2">
+                      ✨ Coincidencia alta: ambos tienen figuritas útiles para intercambiar.
                     </div>
                   )}
 
-                  {/* You have what she needs */}
-                  {m.userOffersToThem.length > 0 ? (
-                    <div className="flex items-start gap-1.5 pt-1.5 border-t border-dashed border-gray-200">
-                      <span className="text-indigo-600 font-bold flex-shrink-0">Necesita:</span>
-                      <div className="flex flex-wrap gap-1">
-                        {m.userOffersToThem.map((stickerNum) => (
-                          <span
-                            key={stickerNum}
-                            className="bg-indigo-150 text-indigo-800 font-mono text-[9px] font-black px-1.5 py-0.5 rounded-md"
-                          >
-                            #{stickerNum}
-                          </span>
-                        ))}
-                        <span className="text-[10px] text-gray-400 self-center">
-                          que vos tenés repetida
-                        </span>
-                      </div>
+                  {m.theyOfferToUser.length > 0 && (
+                    <div className="text-slate-700 font-semibold leading-relaxed">
+                      👉 <strong className="text-slate-900">{m.collector.name}</strong> tiene {m.theyOfferToUser.map(code => `${code}`).join(' y ')}, que te faltan.
                     </div>
-                  ) : (
-                    <div className="pt-1.5 border-t border-dashed border-gray-200 text-gray-400 font-light text-[10px]">
-                      Aún no registramos qué repetidas tuyas necesita esta persona.
+                  )}
+
+                  {m.userOffersToThem.length > 0 && (
+                    <div className="text-slate-700 font-semibold leading-relaxed pt-1.5 border-t border-dashed border-indigo-100">
+                      👈 Vos tenés {m.userOffersToThem.map(code => `${code}`).join(' y ')}, que {m.collector.name} necesita.
                     </div>
                   )}
 

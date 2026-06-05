@@ -5,8 +5,8 @@ import { ArrowLeft, RefreshCw, Calendar, MapPin, ThumbsUp, Check, X, ShieldAlert
 
 interface ProposalScreenProps {
   collector: NearbyCollector;
-  userDuplicates: number[];
-  userMissings: number[];
+  userDuplicates: string[];
+  userMissings: string[];
   onSubmitProposal: (proposal: TradeProposal) => void;
   onBack: () => void;
   activeProposals?: TradeProposal[];
@@ -24,17 +24,15 @@ export default function ProposalScreen({
 }: ProposalScreenProps) {
   const [viewMode, setViewMode] = useState<'create' | 'list'>('create');
   
-  // Create mode state
-  const [offered, setOffered] = useState<number[]>(
+  // Create mode state using string codes
+  const [offered, setOffered] = useState<string[]>(
     Object.keys(collector.stickers)
-      .map(Number)
-      .filter((n) => collector.stickers[n] === 'faltante' && userDuplicates.includes(n))
+      .filter((code) => collector.stickers[code] === 'faltante' && userDuplicates.includes(code))
   );
   
-  const [requested, setRequested] = useState<number[]>(
+  const [requested, setRequested] = useState<string[]>(
     Object.keys(collector.stickers)
-      .map(Number)
-      .filter((n) => collector.stickers[n] === 'repetida' && userMissings.includes(n))
+      .filter((code) => collector.stickers[code] === 'repetida' && userMissings.includes(code))
   );
 
   const [selectedSafePoint, setSelectedSafePoint] = useState<string>(SUGGESTED_SAFE_POINTS[0].name);
@@ -42,19 +40,19 @@ export default function ProposalScreen({
   const [activeRating, setActiveRating] = useState<{ proposalId: string; stars: number } | null>(null);
 
   // Toggle selection
-  const handleToggleOffered = (num: number) => {
-    if (offered.includes(num)) {
-      setOffered(offered.filter((n) => n !== num));
+  const handleToggleOffered = (code: string) => {
+    if (offered.includes(code)) {
+      setOffered(offered.filter((item) => item !== code));
     } else {
-      setOffered([...offered, num]);
+      setOffered([...offered, code]);
     }
   };
 
-  const handleToggleRequested = (num: number) => {
-    if (requested.includes(num)) {
-      setRequested(requested.filter((n) => n !== num));
+  const handleToggleRequested = (code: string) => {
+    if (requested.includes(code)) {
+      setRequested(requested.filter((item) => item !== code));
     } else {
-      setRequested([...requested, num]);
+      setRequested([...requested, code]);
     }
   };
 

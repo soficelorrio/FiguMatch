@@ -160,38 +160,38 @@ export default function App() {
   }, [matchedResults]);
 
   // 3. Mutation handlers
-  const handleUpdateStickerStatus = (num: number, status: StickerStatus) => {
+  const handleUpdateStickerStatus = (code: string, status: StickerStatus) => {
     const updated = [...stickersList];
-    const index = updated.findIndex((s) => s.number === num);
+    const index = updated.findIndex((s) => s.code === code);
     if (index >= 0) {
-      updated[index] = { number: num, status };
+      updated[index] = { code, status };
     } else {
-      updated.push({ number: num, status });
+      updated.push({ code, status });
     }
     setStickersList(updated);
     persistState(STORAGE_KEYS.STICKERS, updated);
 
     // Dynamic push notifier
     if (status === 'faltante') {
-      addNotification(`🔍 Buscando quién tiene la figurita #${num} cerca tuyo...`);
+      addNotification(`🔍 Buscando quién tiene la figurita #${code} cerca tuyo...`);
     } else if (status === 'repetida') {
-      addNotification(`🔵 Pusiste la figurita #${num} a disposición para canje.`);
+      addNotification(`🔵 Pusiste la figurita #${code} a disposición para canje.`);
     }
   };
 
-  const handleBulkAddStickers = (numbers: number[], status: StickerStatus) => {
+  const handleBulkAddStickers = (codes: string[], status: StickerStatus) => {
     const updated = [...stickersList];
-    numbers.forEach((num) => {
-      const idx = updated.findIndex((s) => s.number === num);
+    codes.forEach((code) => {
+      const idx = updated.findIndex((s) => s.code === code);
       if (idx >= 0) {
-        updated[idx] = { number: num, status };
+        updated[idx] = { code, status };
       } else {
-        updated.push({ number: num, status });
+        updated.push({ code, status });
       }
     });
     setStickersList(updated);
     persistState(STORAGE_KEYS.STICKERS, updated);
-    addNotification(`⚡ Se cargaron ${numbers.length} figuritas como ${status === 'faltante' ? 'Faltantes' : 'Repetidas'}.`);
+    addNotification(`⚡ Se cargaron ${codes.length} figuritas como ${status === 'faltante' ? 'Faltantes' : 'Repetidas'}.`);
   };
 
   const addNotification = (text: string) => {
